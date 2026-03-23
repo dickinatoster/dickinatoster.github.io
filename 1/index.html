@@ -89,29 +89,30 @@
     .hud {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      gap: 6px;
+      gap: clamp(4px, 2vw, 8px);
       width: 100%;
     }
 
     .card {
-      border-radius: 10px;
+      border-radius: clamp(8px, 1.5vw, 12px);
       border: 1px solid rgba(148, 225, 255, 0.25);
       background: rgba(4, 18, 30, 0.74);
-      padding: 6px 8px;
+      padding: clamp(5px, 1.5vw, 10px);
     }
 
     .label {
       color: var(--text-sub);
-      font-size: 0.68rem;
+      font-size: clamp(0.6rem, 2vw, 0.8rem);
       letter-spacing: 0.2px;
-      margin-bottom: 2px;
+      margin-bottom: clamp(1px, 0.8vw, 4px);
       display: block;
     }
 
     .value {
-      font-size: 1.2rem;
+      font-size: clamp(1rem, 3.5vw, 1.4rem);
       font-weight: 900;
       font-family: "Chakra Petch", sans-serif;
+      line-height: 1.1;
     }
 
     .controls {
@@ -222,15 +223,15 @@
     }
 
     .touch-panel {
-      margin-top: 6px;
+      margin-top: clamp(4px, 1.5vw, 8px);
       width: 100%;
-      height: 72px;
+      height: clamp(60px, 15vw, 80px);
       display: flex;
       position: relative;
-      gap: 6px;
+      gap: clamp(4px, 1vw, 8px);
       justify-content: center;
       align-items: center;
-      padding-top: 2px;
+      padding-top: clamp(1px, 0.8vw, 4px);
     }
 
     .touch-panel::after {
@@ -240,8 +241,8 @@
     }
 
     .touch-btn {
-      width: 48px;
-      height: 48px;
+      width: clamp(40px, 10vw, 56px);
+      height: clamp(40px, 10vw, 56px);
       position: relative;
       top: auto;
       left: auto;
@@ -253,8 +254,8 @@
       background: linear-gradient(160deg, rgba(24, 70, 104, 0.95), rgba(10, 31, 50, 0.95));
       color: #dff8ff;
       font-weight: 900;
-      font-size: 1.1rem;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.24);
+      font-size: clamp(0.9rem, 2.2vw, 1.2rem);
+      box-shadow: 0 clamp(2px, 1vw, 8px) clamp(6px, 2vw, 12px) rgba(0, 0, 0, 0.24);
       padding: 0;
       display: grid;
       place-items: center;
