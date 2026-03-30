@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 360" role="img" aria-labelledby="title desc">
+  <title id="title">簡單蛇圖案</title>
+  <desc id="desc">綠色可愛小蛇，線條簡潔。</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0%" stop-color="#e6fff3" />
+      <stop offset="100%" stop-color="#c7f4df" />
+    </linearGradient>
+  </defs>
+  <rect width="640" height="360" fill="url(#bg)" />
+  <g fill="none" stroke="#1f7a57" stroke-width="14" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M104 248c72-98 170 18 230-62 34-44 96-46 148-6" />
+    <path d="M480 180c24 10 36 34 28 58-8 26-30 42-56 42-30 0-54-24-54-54s24-54 54-54" fill="#8be3be" />
+    <circle cx="486" cy="214" r="5" fill="#1f7a57" stroke="none" />
+    <circle cx="454" cy="214" r="5" fill="#1f7a57" stroke="none" />
+    <path d="M466 234c10 8 22 8 32 0" stroke-width="8" />
+    <path d="M508 232c18 6 26 18 24 34" stroke="#d95f5f" stroke-width="6" />
+  </g>
+</svg>
