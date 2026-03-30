@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>王怡文 | 作品集首頁</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;600;800&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg-1: #f4efe6;
+      --bg-2: #dbe9f4;
+      --ink: #17202a;
+      --muted: #4f5f70;
+      --accent: #e75a3c;
+      --accent-2: #0d8fb0;
+      --card: rgba(255, 255, 255, 0.74);
+      --line: rgba(23, 32, 42, 0.12);
+      --shadow: 0 18px 40px rgba(23, 32, 42, 0.16);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--ink);
+      font-family: "Noto Sans TC", sans-serif;
+      background:
+        radial-gradient(circle at 12% 18%, rgba(231, 90, 60, 0.22), transparent 40%),
+        radial-gradient(circle at 82% 24%, rgba(13, 143, 176, 0.25), transparent 44%),
+        linear-gradient(145deg, var(--bg-1), var(--bg-2));
+      overflow-x: hidden;
+    }
+
+    .grain {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background-image: linear-gradient(rgba(0, 0, 0, 0.02), rgba(0, 0, 0, 0.02));
+      mix-blend-mode: multiply;
+      opacity: 0.5;
+      z-index: 1;
+    }
+
+    main {
+      position: relative;
+      z-index: 2;
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 48px 20px 64px;
+      animation: fade-slide 700ms ease both;
+    }
+
+    .hero {
+      padding: 30px;
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      box-shadow: var(--shadow);
+      background: var(--card);
+      backdrop-filter: blur(10px);
+    }
+
+    .hero .tag {
+      display: inline-block;
+      padding: 6px 12px;
+      border-radius: 999px;
+      border: 1px solid rgba(23, 32, 42, 0.2);
+      font: 600 0.82rem/1 "Space Grotesk", sans-serif;
+      letter-spacing: 0.08em;
+    }
+
+    h1 {
+      margin: 14px 0 12px;
+      font: 800 clamp(2rem, 4vw, 3.2rem)/1.2 "Space Grotesk", "Noto Sans TC", sans-serif;
+      letter-spacing: 0.02em;
+    }
+
+    .intro {
+      margin: 0;
+      color: var(--muted);
+      font-size: clamp(1rem, 2.2vw, 1.15rem);
+      line-height: 1.8;
+      max-width: 68ch;
+    }
+
+    .works {
+      margin-top: 26px;
+      display: grid;
+      gap: 14px;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .card {
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      padding: 18px;
+      background: rgba(255, 255, 255, 0.88);
+      transform: translateY(14px);
+      opacity: 0;
+      animation: rise 600ms ease forwards;
+    }
+
+    .card:nth-child(2) {
+      animation-delay: 120ms;
+    }
+
+    .card h2 {
+      margin: 0;
+      font: 700 1.2rem/1.3 "Space Grotesk", "Noto Sans TC", sans-serif;
+    }
+
+    .card p {
+      margin: 8px 0 14px;
+      color: var(--muted);
+      line-height: 1.7;
+    }
+
+    .card a {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 10px 14px;
+      border-radius: 12px;
+      text-decoration: none;
+      color: #fff;
+      background: linear-gradient(120deg, var(--accent), #ff8a4f);
+      font-weight: 700;
+      transition: transform 180ms ease, box-shadow 180ms ease;
+      box-shadow: 0 10px 20px rgba(231, 90, 60, 0.3);
+    }
+
+    .card:nth-child(2) a {
+      background: linear-gradient(120deg, var(--accent-2), #27b0d2);
+      box-shadow: 0 10px 20px rgba(13, 143, 176, 0.28);
+    }
+
+    .card a:hover,
+    .card a:focus-visible {
+      transform: translateY(-2px);
+    }
+
+    @keyframes fade-slide {
+      from {
+        opacity: 0;
+        transform: translateY(14px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes rise {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @media (max-width: 700px) {
+      main {
+        padding-top: 28px;
+      }
+
+      .hero {
+        padding: 22px;
+      }
+
+      .works {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="grain" aria-hidden="true"></div>
+  <main>
+    <section class="hero" aria-labelledby="intro-title">
+      <span class="tag">PORTFOLIO HOME</span>
+      <h1 id="intro-title">你好，我是王怡文</h1>
+      <p class="intro">
+        我喜歡把程式結合互動設計，做出簡單又有趣的小遊戲。這裡整理了我的遊戲作品，歡迎點進去體驗。
+      </p>
+
+      <div class="works" aria-label="遊戲作品列表">
+        <article class="card">
+          <h2>1. 打地鼠</h2>
+          <p>在限定時間內快速點擊冒出的地鼠，挑戰你的反應速度與手速。</p>
+          <a href="1/index.html">開始遊玩</a>
+        </article>
+
+        <article class="card">
+          <h2>2. 貪吃蛇</h2>
+          <p>控制貪吃蛇吃下食物、避免碰撞，看看你能得到多高分。</p>
+          <a href="2/index.html">開始遊玩</a>
+        </article>
+      </div>
+    </section>
+  </main>
+</body>
+</html>
