@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 360" role="img" aria-labelledby="title desc">
+  <title id="title">工程計算機縮圖</title>
+  <desc id="desc">深藍色機身的工程計算機，螢幕顯示 sin(30) = 0.5</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#24344b" />
+      <stop offset="100%" stop-color="#101a2a" />
+    </linearGradient>
+    <linearGradient id="screen" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#e7f1d7" />
+      <stop offset="100%" stop-color="#c7d9b1" />
+    </linearGradient>
+    <linearGradient id="key" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#5e7495" />
+      <stop offset="100%" stop-color="#3d5170" />
+    </linearGradient>
+  </defs>
+  <rect width="640" height="360" rx="28" fill="#efe6d9" />
+  <rect x="86" y="30" width="468" height="300" rx="34" fill="url(#bg)" stroke="#617da5" stroke-width="3" />
+  <rect x="118" y="64" width="404" height="90" rx="16" fill="url(#screen)" stroke="#b6c9a1" stroke-width="2" />
+  <text x="136" y="98" font-size="34" fill="#1d2218" font-family="Noto Sans TC, sans-serif" font-weight="700">Engineering Calculator</text>
+  <text x="136" y="132" font-size="36" fill="#1d2218" font-family="Space Grotesk, sans-serif" font-weight="700">sin(30) = 0.5</text>
+
+  <rect x="118" y="180" width="96" height="52" rx="12" fill="url(#key)" />
+  <rect x="228" y="180" width="96" height="52" rx="12" fill="url(#key)" />
+  <rect x="338" y="180" width="96" height="52" rx="12" fill="url(#key)" />
+  <rect x="448" y="180" width="74" height="52" rx="12" fill="#f0ad35" />
+
+  <rect x="118" y="246" width="96" height="52" rx="12" fill="url(#key)" />
+  <rect x="228" y="246" width="96" height="52" rx="12" fill="url(#key)" />
+  <rect x="338" y="246" width="96" height="52" rx="12" fill="url(#key)" />
+  <rect x="448" y="246" width="74" height="52" rx="12" fill="#5b6e8a" />
+</svg>

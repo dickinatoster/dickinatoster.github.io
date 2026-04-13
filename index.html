@@ -108,6 +108,10 @@
       animation-delay: 120ms;
     }
 
+    .card:nth-child(3) {
+      animation-delay: 240ms;
+    }
+
     .card h2 {
       margin: 0;
       font: 700 1.2rem/1.3 "Space Grotesk", "Noto Sans TC", sans-serif;
@@ -153,6 +157,11 @@
     .card:nth-child(2) .play-link {
       background: linear-gradient(120deg, var(--accent-2), #27b0d2);
       box-shadow: 0 10px 20px rgba(13, 143, 176, 0.28);
+    }
+
+    .card:nth-child(3) .play-link {
+      background: linear-gradient(120deg, #384a67, #556c92);
+      box-shadow: 0 10px 20px rgba(36, 52, 75, 0.28);
     }
 
     .card .play-link:hover,
@@ -220,6 +229,15 @@
           <h2>2. 貪吃蛇</h2>
           <p>控制貪吃蛇吃下食物、避免碰撞，看看你能得到多高分。</p>
           <a class="play-link" href="2/index.html">開始遊玩</a>
+        </article>
+
+        <article class="card">
+          <a class="thumb" href="4/index.html" aria-label="前往工程計算機">
+            <img src="assets/calculator.svg" alt="工程計算機縮圖" />
+          </a>
+          <h2>4. 工程計算機</h2>
+          <p>支援 sin、cos、tan 等函數與四則運算，三角函數採角度制。</p>
+          <a class="play-link" href="4/index.html">開始使用</a>
         </article>
       </div>
     </section>

@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>工程計算機</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Noto+Sans+TC:wght@400;600;800&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --sand: #efe5d8;
+      --paper: #f7f1e7;
+      --ink: #1f1c19;
+      --muted: #5f584f;
+      --navy: #24344b;
+      --navy-2: #142238;
+      --accent: #f0ad35;
+      --line: rgba(31, 28, 25, 0.18);
+      --btn: #e5ded3;
+      --btn-strong: #d6ccbe;
+      --screen: #d9e7cb;
+      --screen-ink: #10180f;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      font-family: "Noto Sans TC", sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 10% 8%, rgba(255, 255, 255, 0.56), transparent 36%),
+        radial-gradient(circle at 90% 90%, rgba(20, 34, 56, 0.22), transparent 42%),
+        linear-gradient(160deg, #dbc9b7, #efe8dc 40%, #ded3c5);
+      padding: 24px;
+    }
+
+    .panel {
+      width: min(880px, 100%);
+      border-radius: 28px;
+      border: 1px solid var(--line);
+      background: var(--paper);
+      box-shadow: 0 24px 58px rgba(20, 34, 56, 0.18);
+      display: grid;
+      grid-template-columns: 1.1fr 1fr;
+      overflow: hidden;
+      animation: card-in 550ms ease both;
+    }
+
+    .intro {
+      padding: 34px 30px;
+      background: linear-gradient(185deg, #f5efe4, #efe5d7);
+      border-right: 1px solid var(--line);
+    }
+
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 6px 12px;
+      font: 700 0.75rem/1 "Space Grotesk", sans-serif;
+      letter-spacing: 0.08em;
+    }
+
+    h1 {
+      margin: 16px 0 10px;
+      font: 800 clamp(1.8rem, 3.4vw, 2.6rem)/1.16 "Space Grotesk", "Noto Sans TC", sans-serif;
+      letter-spacing: 0.01em;
+    }
+
+    .desc {
+      margin: 0;
+      color: var(--muted);
+      font-size: 1.25rem;
+      line-height: 1.8;
+      max-width: 30ch;
+    }
+
+    .chips {
+      margin-top: 20px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .chip {
+      padding: 9px 14px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      background: #f2ece2;
+      font-weight: 700;
+    }
+
+    .theme-row {
+      margin-top: 16px;
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .theme-label {
+      font: 700 0.85rem/1 "Space Grotesk", "Noto Sans TC", sans-serif;
+      letter-spacing: 0.04em;
+      color: var(--muted);
+    }
+
+    .theme-swatch {
+      width: 34px;
+      min-height: 34px;
+      border-radius: 999px;
+      border: 2px solid rgba(255, 255, 255, 0.66);
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.18);
+      padding: 0;
+    }
+
+    .theme-swatch[data-theme="graphite"] {
+      background: linear-gradient(120deg, #2b3039, #7e8796);
+    }
+
+    .theme-swatch.is-active {
+      outline: 2px solid rgba(31, 28, 25, 0.5);
+      outline-offset: 2px;
+    }
+
+    .calc-wrap {
+      padding: 28px;
+      background: linear-gradient(200deg, var(--navy), var(--navy-2));
+      display: grid;
+      align-content: center;
+    }
+
+    .calc {
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      border-radius: 22px;
+      background: rgba(255, 255, 255, 0.06);
+      padding: 14px;
+      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08), 0 16px 24px rgba(0, 0, 0, 0.25);
+    }
+
+    .screen {
+      border-radius: 16px;
+      background: linear-gradient(180deg, #e2efcf, var(--screen));
+      padding: 12px;
+      min-height: 92px;
+      border: 1px solid rgba(16, 24, 15, 0.2);
+      color: var(--screen-ink);
+      display: grid;
+      align-content: space-between;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .expr {
+      min-height: 24px;
+      font: 700 1rem/1.4 "Space Grotesk", "Noto Sans TC", sans-serif;
+      opacity: 0.85;
+      word-break: break-all;
+    }
+
+    .result {
+      min-height: 34px;
+      font: 800 1.6rem/1.2 "Space Grotesk", "Noto Sans TC", sans-serif;
+      word-break: break-all;
+    }
+
+    .keys {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 8px;
+    }
+
+    button {
+      appearance: none;
+      border: 1px solid transparent;
+      border-radius: 11px;
+      min-height: 44px;
+      font: 700 1rem/1 "Space Grotesk", "Noto Sans TC", sans-serif;
+      color: #102131;
+      background: linear-gradient(180deg, #f2eee8, var(--btn));
+      box-shadow: 0 8px 14px rgba(0, 0, 0, 0.22);
+      cursor: pointer;
+      transition: transform 120ms ease, filter 120ms ease;
+    }
+
+    button:hover,
+    button:focus-visible {
+      transform: translateY(-1px);
+      filter: brightness(1.02);
+      outline: none;
+    }
+
+    button:active {
+      transform: translateY(1px);
+    }
+
+    .op {
+      background: linear-gradient(180deg, #e5ddd1, var(--btn-strong));
+    }
+
+    .accent {
+      color: #2f2200;
+      background: linear-gradient(180deg, #f7c35a, var(--accent));
+    }
+
+    .danger {
+      color: #fff;
+      background: linear-gradient(180deg, #f16a66, #db4b48);
+    }
+
+    .dark {
+      color: #e8edf7;
+      background: linear-gradient(180deg, #2f3d52, #263448);
+    }
+
+    .mini {
+      min-height: 40px;
+      font-size: 0.9rem;
+    }
+
+    .wide {
+      grid-column: span 2;
+    }
+
+    .helper {
+      margin-top: 10px;
+      color: rgba(255, 255, 255, 0.82);
+      font-size: 0.88rem;
+      letter-spacing: 0.02em;
+    }
+
+    body[data-theme="forest"] {
+      --paper: #e8efe7;
+      --muted: #3f5a53;
+      --navy: #1f3d37;
+      --navy-2: #142a26;
+      --accent: #7ab086;
+      --btn: #dbe7dc;
+      --btn-strong: #ccdbcf;
+      --screen: #dae7cf;
+    }
+
+    body[data-theme="graphite"] {
+      --paper: #eceef2;
+      --muted: #4f5562;
+      --navy: #2b3039;
+      --navy-2: #1f232b;
+      --accent: #f0b24c;
+      --btn: #dee2ea;
+      --btn-strong: #cfd5df;
+      --screen: #d8dde5;
+    }
+
+    @keyframes card-in {
+      from {
+        opacity: 0;
+        transform: translateY(14px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @media (max-width: 880px) {
+      .panel {
+        grid-template-columns: 1fr;
+      }
+
+      .intro {
+        border-right: 0;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .desc {
+        font-size: 1.12rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <section class="panel" aria-label="工程計算機區塊">
+    <div class="intro">
+      <span class="tag">ENGINEERING MODE</span>
+      <h1>工程計算機</h1>
+      <p class="desc">以經典工程計算機介面為靈感，整合常用函數，即時運算與操作提示，適合進行日常算式與進階計算。</p>
+      <div class="chips" aria-label="功能標籤">
+        <span class="chip">函數運算</span>
+        <span class="chip">工具導向</span>
+        <span class="chip">介面設計</span>
+      </div>
+      <div class="theme-row" aria-label="配色切換">
+        <span class="theme-label">配色</span>
+        <button type="button" class="theme-swatch is-active" data-theme="graphite" aria-label="石墨灰主題" disabled></button>
+      </div>
+    </div>
+
+    <div class="calc-wrap">
+      <div class="calc">
+        <div class="screen" aria-live="polite">
+          <div id="expr" class="expr">sin(30)</div>
+          <div id="result" class="result">0.5</div>
+        </div>
+
+        <div class="keys" aria-label="計算機按鍵">
+          <button type="button" class="dark mini" disabled>SHIFT</button>
+          <button type="button" class="dark mini" disabled>DRG</button>
+          <button type="button" class="dark mini" data-value="(">(</button>
+          <button type="button" class="dark mini" data-value=")">)</button>
+          <button type="button" class="dark mini" data-action="memory-store">STO</button>
+          <button type="button" class="dark mini" data-action="memory-recall">RCL</button>
+
+          <button type="button" class="op" data-fn="sin">sin</button>
+          <button type="button" class="op" data-fn="cos">cos</button>
+          <button type="button" class="op" data-fn="tan">tan</button>
+          <button type="button" class="op" data-fn="log">log</button>
+          <button type="button" class="op" data-fn="ln">ln</button>
+          <button type="button" class="op" data-const="pi">π</button>
+
+          <button type="button" class="op" data-fn="sqrt">√</button>
+          <button type="button" class="op" data-value="^">x^y</button>
+          <button type="button" class="op" data-const="e">e</button>
+          <button type="button" class="op" data-action="ans">Ans</button>
+          <button type="button" class="danger" data-action="backspace">DEL</button>
+          <button type="button" class="danger" data-action="clear">AC</button>
+
+          <button type="button" class="dark" data-value="7">7</button>
+          <button type="button" class="dark" data-value="8">8</button>
+          <button type="button" class="dark" data-value="9">9</button>
+          <button type="button" class="dark" data-value="/">÷</button>
+          <button type="button" class="dark" data-value="*">×</button>
+          <button type="button" class="dark" data-value="%">mod</button>
+
+          <button type="button" class="dark" data-value="4">4</button>
+          <button type="button" class="dark" data-value="5">5</button>
+          <button type="button" class="dark" data-value="6">6</button>
+          <button type="button" class="dark" data-value="+">+</button>
+          <button type="button" class="dark" data-value="-">−</button>
+          <button type="button" class="dark" data-action="negate">(-)</button>
+
+          <button type="button" class="dark" data-value="1">1</button>
+          <button type="button" class="dark" data-value="2">2</button>
+          <button type="button" class="dark" data-value="3">3</button>
+          <button type="button" class="dark" data-value="0">0</button>
+          <button type="button" class="dark" data-value=".">.</button>
+          <button type="button" class="accent" data-action="equal">=</button>
+        </div>
+
+        <p class="helper">三角函數採角度制；支援鍵盤輸入（Enter、Backspace、Esc、S/C/T/R/P/E），例如：sin(30) = 0.5</p>
+      </div>
+    </div>
+  </section>
+
+  <script>
+    const exprEl = document.getElementById("expr");
+    const resultEl = document.getElementById("result");
+    const keys = document.querySelector(".keys");
+    const themeButtons = document.querySelectorAll(".theme-swatch");
+
+    let expression = "sin(30)";
+    let lastAnswer = 0;
+    let memoryValue = 0;
+
+    function normalize(value) {
+      if (!Number.isFinite(value)) {
+        return "Error";
+      }
+      const rounded = Math.round(value * 1e12) / 1e12;
+      return Number.isInteger(rounded) ? String(rounded) : String(rounded);
+    }
+
+    function toRadians(deg) {
+      return deg * (Math.PI / 180);
+    }
+
+    function evaluateExpression(input) {
+      const sanitized = input.replace(/\s+/g, "");
+      if (!sanitized) {
+        return "0";
+      }
+
+      const tokenStripped = sanitized
+        .replace(/sin|cos|tan|sqrt|log|ln|pi|e|Ans/g, "")
+        .replace(/\^/g, "")
+        .replace(/%/g, "");
+
+      if (/[^0-9+\-*/().,]/.test(tokenStripped)) {
+        return "Error";
+      }
+
+      const transformed = sanitized
+        .replace(/sin\(/g, "Math.sin(toRadians(")
+        .replace(/cos\(/g, "Math.cos(toRadians(")
+        .replace(/tan\(/g, "Math.tan(toRadians(")
+        .replace(/log\(/g, "Math.log10(")
+        .replace(/ln\(/g, "Math.log(")
+        .replace(/sqrt\(/g, "Math.sqrt(")
+        .replace(/\bpi\b/g, "Math.PI")
+        .replace(/\be\b/g, "Math.E")
+        .replace(/\^/g, "**")
+        .replace(/\bAns\b/g, String(lastAnswer));
+
+      const allowed = /^[0-9+\-*/().,A-Za-z_]+$/;
+      if (!allowed.test(transformed)) {
+        return "Error";
+      }
+
+      try {
+        const fn = new Function("toRadians", "return " + transformed);
+        const value = fn(toRadians);
+        return normalize(value);
+      } catch {
+        return "Error";
+      }
+    }
+
+    function render() {
+      exprEl.textContent = expression || "0";
+      resultEl.textContent = evaluateExpression(expression);
+    }
+
+    function applyTheme(themeName) {
+      document.body.dataset.theme = themeName;
+      themeButtons.forEach((button) => {
+        button.classList.toggle("is-active", button.dataset.theme === themeName);
+      });
+      localStorage.setItem("calcTheme", themeName);
+    }
+
+    function handleInput(action, value, fn, constant) {
+      if (action === "clear") {
+        expression = "";
+      } else if (action === "backspace") {
+        expression = expression.slice(0, -1);
+      } else if (action === "equal") {
+        const calculated = evaluateExpression(expression);
+        expression = calculated;
+        if (calculated !== "Error") {
+          lastAnswer = Number(calculated);
+        }
+      } else if (action === "ans") {
+        if (expression === "Error") {
+          expression = "";
+        }
+        expression += "Ans";
+      } else if (action === "memory-store") {
+        const currentValue = evaluateExpression(expression);
+        if (currentValue !== "Error") {
+          memoryValue = Number(currentValue);
+        }
+      } else if (action === "memory-recall") {
+        if (expression === "Error") {
+          expression = "";
+        }
+        expression += String(memoryValue);
+      } else if (action === "negate") {
+        if (expression === "Error") {
+          expression = "";
+        }
+        expression = "(-1)*(" + (expression || "0") + ")";
+      } else if (fn) {
+        if (expression === "Error") {
+          expression = "";
+        }
+        expression += fn + "(";
+      } else if (constant) {
+        if (expression === "Error") {
+          expression = "";
+        }
+        expression += constant;
+      } else if (value) {
+        if (expression === "Error") {
+          expression = "";
+        }
+        expression += value;
+      }
+
+      render();
+    }
+
+    keys.addEventListener("click", (event) => {
+      const button = event.target.closest("button");
+      if (!button) {
+        return;
+      }
+
+      const action = button.dataset.action;
+      const value = button.dataset.value;
+      const fn = button.dataset.fn;
+      const constant = button.dataset.const;
+
+      handleInput(action, value, fn, constant);
+    });
+
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Enter") {
+        event.preventDefault();
+        handleInput("equal");
+        return;
+      }
+
+      if (event.key === "Backspace") {
+        event.preventDefault();
+        handleInput("backspace");
+        return;
+      }
+
+      if (event.key === "Escape") {
+        event.preventDefault();
+        handleInput("clear");
+        return;
+      }
+
+      if (/^[0-9+\-*/().]$/.test(event.key)) {
+        event.preventDefault();
+        handleInput(undefined, event.key);
+        return;
+      }
+
+      const key = event.key.toLowerCase();
+      if (key === "s") {
+        event.preventDefault();
+        handleInput(undefined, undefined, "sin");
+        return;
+      }
+
+      if (key === "c") {
+        event.preventDefault();
+        handleInput(undefined, undefined, "cos");
+        return;
+      }
+
+      if (key === "t") {
+        event.preventDefault();
+        handleInput(undefined, undefined, "tan");
+        return;
+      }
+
+      if (key === "r") {
+        event.preventDefault();
+        handleInput(undefined, undefined, "sqrt");
+        return;
+      }
+
+      if (key === "p") {
+        event.preventDefault();
+        handleInput(undefined, undefined, undefined, "pi");
+        return;
+      }
+
+      if (key === "e") {
+        event.preventDefault();
+        handleInput(undefined, undefined, undefined, "e");
+        return;
+      }
+
+      if (key === "%" || key === "^") {
+        event.preventDefault();
+        handleInput(undefined, key);
+        return;
+      }
+
+      if (key === "a") {
+        event.preventDefault();
+        handleInput("ans");
+      }
+    });
+
+    applyTheme("graphite");
+
+    render();
+  </script>
+</body>
+</html>
