@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Gemini Chat</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+TC:wght@400;500;700;800&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #0f0f0f;
+      --bg-2: #181818;
+      --panel: rgba(24, 24, 24, 0.94);
+      --panel-2: rgba(18, 18, 18, 0.97);
+      --card: rgba(34, 34, 34, 0.92);
+      --card-soft: rgba(42, 42, 42, 0.86);
+      --line: rgba(255, 255, 255, 0.08);
+      --ink: #f6f6f6;
+      --muted: #c8c8c8;
+      --muted-2: #9c9c9c;
+      --accent: #ffffff;
+      --accent-2: #d8d8d8;
+      --accent-3: #f0f0f0;
+      --shadow: 0 18px 60px rgba(0, 0, 0, 0.5);
+      --radius-xl: 28px;
+      --radius-lg: 22px;
+      --radius-md: 16px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html, body {
+      margin: 0;
+      min-height: 100%;
+    }
+
+    body {
+      font-family: "Inter", "Noto Sans TC", sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 18% 14%, rgba(255, 255, 255, 0.08), transparent 24%),
+        radial-gradient(circle at 85% 88%, rgba(255, 255, 255, 0.05), transparent 30%),
+        linear-gradient(180deg, #1c1915 0%, #171512 40%, #13110f 100%);
+      overflow-x: hidden;
+    }
+
+    .shell {
+      position: relative;
+      max-width: 1240px;
+      margin: 0 auto;
+      padding: 18px 18px 28px;
+    }
+
+    .shell::before,
+    .shell::after {
+      content: "";
+      position: fixed;
+      inset: auto;
+      pointer-events: none;
+      border-radius: 999px;
+      filter: blur(24px);
+      opacity: 0.5;
+      z-index: 0;
+    }
+
+    .shell::before {
+      width: 260px;
+      height: 260px;
+      left: -80px;
+      top: 48px;
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    .shell::after {
+      width: 320px;
+      height: 320px;
+      right: -100px;
+      bottom: 10px;
+      background: rgba(255, 255, 255, 0.06);
+    }
+
+    .hero {
+      position: relative;
+      z-index: 1;
+      padding: 28px 28px 24px;
+      border: 1px solid var(--line);
+      border-radius: 30px;
+      background: linear-gradient(180deg, rgba(26, 26, 26, 0.96), rgba(17, 17, 17, 0.98));
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .hero::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(135deg, rgba(255,255,255,0.03), transparent 45%),
+        radial-gradient(circle at 20% 5%, rgba(255,255,255,0.04), transparent 30%);
+      pointer-events: none;
+    }
+
+    .topline {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 18px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .designer {
+      display: inline-flex;
+      align-items: center;
+      padding: 8px 12px;
+      border-radius: 999px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      color: #eeeeee;
+      background: rgba(0, 0, 0, 0.25);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .badge {
+      padding: 10px 14px;
+      border-radius: 999px;
+      font-size: 0.84rem;
+      font-weight: 700;
+      color: #f2f2f2;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      white-space: nowrap;
+    }
+
+    .lead {
+      position: relative;
+      z-index: 1;
+      padding: 6px 2px 18px;
+      max-width: 860px;
+    }
+
+    .lead h1 {
+      margin: 0 0 12px;
+      font-size: clamp(2rem, 4vw, 3.7rem);
+      line-height: 1.05;
+      letter-spacing: 0.01em;
+      font-weight: 800;
+    }
+
+    .lead p {
+      margin: 0;
+      max-width: 760px;
+      color: var(--muted);
+      font-size: clamp(1rem, 1.5vw, 1.08rem);
+      line-height: 1.9;
+    }
+
+    .chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 22px;
+    }
+
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 36px;
+      padding: 0 16px;
+      border-radius: 999px;
+      color: #111;
+      background: #f3f3f3;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      font-size: 0.92rem;
+      font-weight: 700;
+      box-shadow: 0 8px 18px rgba(0, 0, 0, 0.18);
+    }
+
+    .workspace {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      grid-template-columns: 286px minmax(0, 1fr);
+      gap: 16px;
+      margin-top: 18px;
+    }
+
+    .sidebar,
+    .chat {
+      border: 1px solid var(--line);
+      border-radius: 26px;
+      background: linear-gradient(180deg, rgba(28, 28, 28, 0.96), rgba(18, 18, 18, 0.99));
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .sidebar {
+      padding: 18px;
+    }
+
+    .sidebar-card {
+      border-radius: 20px;
+      padding: 18px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      margin-bottom: 16px;
+    }
+
+    .sidebar-title {
+      margin: 0 0 8px;
+      font-size: 1.05rem;
+      line-height: 1.3;
+      font-weight: 800;
+    }
+
+    .sidebar-text {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.8;
+      font-size: 0.96rem;
+    }
+
+    .field {
+      margin-top: 14px;
+    }
+
+    .field label {
+      display: block;
+      margin-bottom: 8px;
+      color: #f2eadf;
+      font-size: 0.96rem;
+      font-weight: 700;
+    }
+
+    .input,
+    .select,
+    .textarea {
+      width: 100%;
+      border: 1px solid rgba(255, 255, 255, 0.04);
+      border-radius: 16px;
+      background: rgba(255, 255, 255, 0.06);
+      color: var(--ink);
+      color-scheme: dark;
+      font: inherit;
+      outline: none;
+      transition: border-color 140ms ease, transform 140ms ease, box-shadow 140ms ease;
+    }
+
+    .input:focus,
+    .select:focus,
+    .textarea:focus {
+      border-color: rgba(123, 211, 199, 0.34);
+      box-shadow: 0 0 0 3px rgba(123, 211, 199, 0.08);
+      transform: translateY(-1px);
+    }
+
+    .input,
+    .select {
+      height: 52px;
+      padding: 0 16px;
+      color: #f2f2f2;
+    }
+
+    .textarea {
+      min-height: 160px;
+      resize: none;
+      padding: 16px;
+      color: #f2f2f2;
+    }
+
+    .hint {
+      margin: 12px 0 0;
+      color: var(--muted-2);
+      font-size: 0.82rem;
+      line-height: 1.7;
+    }
+
+    .actions {
+      display: flex;
+      gap: 12px;
+      margin-top: 14px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      appearance: none;
+      border: 0;
+      border-radius: 999px;
+      min-height: 40px;
+      padding: 0 16px;
+      font: inherit;
+      font-size: 0.94rem;
+      font-weight: 800;
+      cursor: pointer;
+      transition: transform 140ms ease, filter 140ms ease, box-shadow 140ms ease;
+    }
+
+    .btn:hover,
+    .btn:focus-visible {
+      transform: translateY(-1px);
+      outline: none;
+    }
+
+    .btn.primary {
+      color: #111;
+      background: linear-gradient(180deg, #ffffff, #d9d9d9);
+      box-shadow: 0 14px 20px rgba(255, 255, 255, 0.12);
+    }
+
+    .btn.ghost {
+      color: #f1f1f1;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .panel-footer {
+      margin-top: 14px;
+      color: var(--muted-2);
+      font-size: 0.83rem;
+      line-height: 1.8;
+    }
+
+    .chat {
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      min-height: 690px;
+    }
+
+    .chat-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 18px 20px 0;
+    }
+
+    .chat-title {
+      margin: 0;
+      font-family: "Noto Sans TC", sans-serif;
+      font-size: clamp(1.45rem, 2.1vw, 2.6rem);
+      font-weight: 800;
+      line-height: 1.1;
+      letter-spacing: 0.01em;
+    }
+
+    .status {
+      padding: 10px 14px;
+      border-radius: 999px;
+      color: #f0f0f0;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      font-size: 0.84rem;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    .chat-body {
+      padding: 16px 20px 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      overflow: hidden;
+    }
+
+    .chat-stage {
+      flex: 1;
+      border-radius: 24px;
+      padding: 16px;
+      background:
+        radial-gradient(circle at 20% 10%, rgba(255, 255, 255, 0.08), transparent 24%),
+        radial-gradient(circle at 88% 16%, rgba(255, 255, 255, 0.05), transparent 26%),
+        linear-gradient(180deg, rgba(40, 40, 40, 0.98), rgba(26, 26, 26, 0.98));
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      min-height: 520px;
+    }
+
+    .user-bubble {
+      align-self: flex-end;
+      max-width: min(72%, 340px);
+      padding: 14px 18px;
+      border-radius: 16px 16px 6px 16px;
+      background: rgba(255, 255, 255, 0.1);
+      color: #ffffff;
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.22);
+      font-weight: 800;
+      line-height: 1.65;
+    }
+
+    .avatar-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 2px;
+    }
+
+    .avatar {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #ffffff, #a8a8a8);
+      box-shadow: 0 0 0 2px rgba(255,255,255,0.03);
+      flex: 0 0 auto;
+    }
+
+    .assistant-msg {
+      display: inline-flex;
+      max-width: 52%;
+      padding: 14px 16px;
+      border-radius: 18px 18px 18px 6px;
+      background: rgba(255, 255, 255, 0.08);
+      color: #f6efe3;
+      font-weight: 700;
+      line-height: 1.75;
+      box-shadow: 0 12px 22px rgba(0, 0, 0, 0.18);
+    }
+
+    .chat-inputbar {
+      padding: 0 20px 18px;
+    }
+
+    .composer {
+      width: 100%;
+      min-height: 116px;
+      border-radius: 22px;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      background: rgba(255, 255, 255, 0.06);
+      color: #ddd4c7;
+      padding: 16px 18px;
+      resize: vertical;
+      font: inherit;
+      outline: none;
+    }
+
+    .composer:focus {
+      box-shadow: 0 0 0 3px rgba(123, 211, 199, 0.08);
+      border-color: rgba(255, 255, 255, 0.24);
+    }
+
+    .sendbar {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 12px;
+      margin-top: 12px;
+      flex-wrap: wrap;
+    }
+
+    .footnote {
+      align-self: flex-start;
+      color: var(--muted-2);
+      font-size: 0.84rem;
+      line-height: 1.8;
+      padding-top: 3px;
+    }
+
+    .bubble-wrap {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      padding: 4px 0 0;
+    }
+
+    @media (max-width: 1100px) {
+      .workspace {
+        grid-template-columns: 1fr;
+      }
+
+      .chat {
+        min-height: 640px;
+      }
+    }
+
+    @media (max-width: 720px) {
+      .shell {
+        padding: 12px;
+      }
+
+      .hero {
+        padding: 20px 16px 18px;
+        border-radius: 24px;
+      }
+
+      .topline {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .workspace {
+        gap: 12px;
+      }
+
+      .sidebar,
+      .chat {
+        border-radius: 22px;
+      }
+
+      .chat-head {
+        padding: 16px 16px 0;
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .chat-body {
+        padding: 14px 16px 16px;
+      }
+
+      .chat-inputbar {
+        padding: 0 16px 16px;
+      }
+
+      .chat-stage {
+        min-height: 480px;
+      }
+
+      .user-bubble,
+      .assistant-msg {
+        max-width: 86%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <section class="hero" aria-labelledby="page-title">
+      <div class="topline">
+        <div class="designer">設計者：王怡文</div>
+        <div class="badge">尚未設定 API Key</div>
+      </div>
+
+      <div class="lead">
+        <h1 id="page-title">Gemini Chat</h1>
+        <p>
+          串接 Google Gemini API，提供可自訂金鑰、模型與系統提示詞的對話介面，並保留完整對話紀錄，練習 AI 互動與 API 整合設計。
+        </p>
+        <div class="chips" aria-label="功能標籤">
+          <span class="chip">AI 對話</span>
+          <span class="chip">API 整合</span>
+          <span class="chip">介面設計</span>
+        </div>
+      </div>
+
+      <div class="workspace">
+        <aside class="sidebar" aria-label="設定側欄">
+          <div class="sidebar-card">
+            <h2 class="sidebar-title">連線設定</h2>
+            <p class="sidebar-text">支援 Gemini 2.5 Flash 與 Gemini 2.0 Flash，貼上你的 API Key 後即可開始。</p>
+
+            <div class="field">
+              <label for="apikey">Gemini API Key</label>
+              <input id="apikey" class="input" type="password" placeholder="貼上你的 Gemini API Key" />
+              <p class="hint">會直接呼叫 Gemini API。提醒：前端可看到金鑰，僅建議本機測試。</p>
+            </div>
+
+            <div class="field">
+              <label for="model">模型</label>
+              <select id="model" class="select">
+                <option>Gemini 2.5 Flash</option>
+                <option>Gemini 2.0 Flash</option>
+              </select>
+              <p class="hint">若 2.5 Flash 在你的帳號區域不可用，可切換到 2.0 Flash。</p>
+            </div>
+
+            <div class="actions">
+              <button class="btn primary" type="button">套用設定</button>
+              <button class="btn ghost" type="button">清除對話</button>
+            </div>
+          </div>
+
+          <div class="sidebar-card">
+            <h2 class="sidebar-title">最近提問</h2>
+            <p class="sidebar-text">點一下可直接帶回輸入框。</p>
+            <p class="panel-footer">目前還沒有提問紀錄。</p>
+          </div>
+        </aside>
+
+        <section class="chat" aria-label="AI 回應視窗">
+          <div class="chat-head">
+            <h2 class="chat-title">AI回應視窗（設計者 王怡文）</h2>
+            <div class="status">尚未設定 API Key</div>
+          </div>
+
+          <div class="chat-body">
+            <div class="chat-stage">
+            </div>
+          </div>
+
+          <div class="chat-inputbar">
+            <textarea class="composer" aria-label="輸入問題" placeholder="輸入你的問題，按 Enter 送出；Shift + Enter 換行。"></textarea>
+            <div class="sendbar">
+              <div class="footnote">目前模型：Gemini 2.5 Flash</div>
+              <button class="btn ghost" type="button">停止等待</button>
+              <button class="btn primary" type="button">送出訊息</button>
+            </div>
+          </div>
+        </section>
+      </div>
+    </section>
+  </main>
+</body>
+</html>
