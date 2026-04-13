@@ -315,8 +315,8 @@
     <div class="calc-wrap">
       <div class="calc">
         <div class="screen" aria-live="polite">
-          <div id="expr" class="expr">sin(30)</div>
-          <div id="result" class="result">0.5</div>
+          <div id="expr" class="expr"></div>
+          <div id="result" class="result"></div>
         </div>
 
         <div class="keys" aria-label="計算機按鍵">
@@ -393,7 +393,7 @@
     function evaluateExpression(input) {
       const sanitized = input.replace(/\s+/g, "");
       if (!sanitized) {
-        return "0";
+        return "";
       }
 
       const tokenStripped = sanitized
