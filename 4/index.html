@@ -374,7 +374,7 @@
     const keys = document.querySelector(".keys");
     const themeButtons = document.querySelectorAll(".theme-swatch");
 
-    let expression = "sin(30)";
+    let expression = "";
     let lastAnswer = 0;
     let memoryValue = 0;
 
@@ -432,7 +432,7 @@
     }
 
     function render() {
-      exprEl.textContent = expression || "0";
+      exprEl.textContent = expression;
       resultEl.textContent = evaluateExpression(expression);
     }
 
