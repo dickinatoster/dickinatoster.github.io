@@ -763,6 +763,132 @@
       return textParts.join("\n").trim() || "模型已回應，但內容為空。";
     }
 
+    function getFallbackModel(model) {
+      if (model === "gemini-2.5-flash") {
+        return "gemini-2.0-flash";
+      }
+      if (model === "gemini-2.0-flash") {
+        return "gemini-2.5-flash";
+      }
+      return null;
+    }
+
+    function parseErrorPayload(text) {
+      if (!text) {
+        return { message: "", status: "" };
+      }
+
+      try {
+        const json = JSON.parse(text);
+        const apiError = json && json.error;
+        return {
+          message: (apiError && apiError.message) || "",
+          status: (apiError && apiError.status) || ""
+        };
+      } catch (_) {
+        return { message: text, status: "" };
+      }
+    }
+
+    function isRetryableStatus(statusCode) {
+      return statusCode === 429 || statusCode === 500 || statusCode === 503;
+    }
+
+    function waitWithAbort(ms, signal) {
+      return new Promise((resolve, reject) => {
+        if (signal.aborted) {
+          reject(new DOMException("Aborted", "AbortError"));
+          return;
+        }
+
+        const timeoutId = setTimeout(() => {
+          signal.removeEventListener("abort", onAbort);
+          resolve();
+        }, ms);
+
+        function onAbort() {
+          clearTimeout(timeoutId);
+          reject(new DOMException("Aborted", "AbortError"));
+        }
+
+        signal.addEventListener("abort", onAbort, { once: true });
+      });
+    }
+
+    async function requestGeminiOnce({ model, apiKey, question, signal }) {
+      const endpoint = "https://generativelanguage.googleapis.com/v1beta/models/" + model + ":generateContent?key=" + encodeURIComponent(apiKey);
+      const response = await fetch(endpoint, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          contents: [
+            {
+              parts: [
+                { text: question }
+              ]
+            }
+          ]
+        }),
+        signal
+      });
+
+      if (!response.ok) {
+        const rawText = await response.text();
+        const parsed = parseErrorPayload(rawText);
+        const err = new Error(parsed.message || ("HTTP " + response.status));
+        err.httpStatus = response.status;
+        err.apiStatus = parsed.status;
+        err.rawText = rawText;
+        throw err;
+      }
+
+      return response.json();
+    }
+
+    async function requestGeminiWithFallback({ preferredModel, apiKey, question, signal }) {
+      const fallbackModel = getFallbackModel(preferredModel);
+      const modelQueue = fallbackModel ? [preferredModel, fallbackModel] : [preferredModel];
+      const maxRetryPerModel = 3;
+      let lastError = null;
+
+      for (let modelIndex = 0; modelIndex < modelQueue.length; modelIndex++) {
+        const model = modelQueue[modelIndex];
+
+        for (let attempt = 1; attempt <= maxRetryPerModel; attempt++) {
+          if (modelIndex > 0 && attempt === 1) {
+            setStatus("模型壅塞，切換到備援模型中...");
+          } else if (attempt > 1) {
+            setStatus("伺服器忙碌，正在重試（第 " + attempt + " 次）...");
+          }
+
+          try {
+            const data = await requestGeminiOnce({ model, apiKey, question, signal });
+            return { data, modelUsed: model, attempts: attempt };
+          } catch (error) {
+            if (error.name === "AbortError") {
+              throw error;
+            }
+
+            lastError = error;
+            const retryable = isRetryableStatus(error.httpStatus);
+            const hasMoreRetryInCurrentModel = attempt < maxRetryPerModel;
+
+            if (retryable && hasMoreRetryInCurrentModel) {
+              const delay = 600 * attempt;
+              await waitWithAbort(delay, signal);
+              continue;
+            }
+
+            break;
+          }
+        }
+      }
+
+      throw lastError || new Error("請求失敗，請稍後再試。");
+    }
+
     async function sendMessage() {
       const apiKey = apikeyInput.value.trim();
       const question = questionInput.value.trim();
@@ -792,40 +918,43 @@
       abortController = new AbortController();
 
       try {
-        const endpoint = "https://generativelanguage.googleapis.com/v1beta/models/" + model + ":generateContent?key=" + encodeURIComponent(apiKey);
-        const response = await fetch(endpoint, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({
-            contents: [
-              {
-                parts: [
-                  { text: question }
-                ]
-              }
-            ]
-          }),
+        const result = await requestGeminiWithFallback({
+          preferredModel: model,
+          apiKey,
+          question,
           signal: abortController.signal
         });
 
-        if (!response.ok) {
-          const errorText = await response.text();
-          throw new Error("HTTP " + response.status + " - " + errorText);
+        const data = result.data;
+        assistant.message.textContent = extractTextFromResponse(data);
+
+        if (result.modelUsed !== model) {
+          assistant.message.textContent += "\n\n（系統提示：已自動改用 " + result.modelUsed + " 回覆）";
+          setStatus("已使用備援模型回覆，準備就緒");
+        } else {
+          setStatus("已連線，準備就緒");
         }
 
-        const data = await response.json();
-        assistant.message.textContent = extractTextFromResponse(data);
-        setStatus("已連線，準備就緒");
         questionInput.value = "";
       } catch (error) {
         if (error.name === "AbortError") {
           assistant.message.textContent = "已停止等待回覆。";
           setStatus("已中止請求");
         } else {
-          assistant.message.textContent = "請求失敗：" + error.message;
-          setStatus("發生錯誤，請檢查 API Key 或網路");
+          const httpStatus = error.httpStatus;
+          if (httpStatus === 503) {
+            assistant.message.textContent = "目前 Gemini 服務流量過高（503），系統已重試並嘗試備援模型，仍未成功。請稍後再試，或先切換到 Gemini 2.0 Flash。";
+            setStatus("伺服器忙碌中，請稍後再試");
+          } else if (httpStatus === 429) {
+            assistant.message.textContent = "請求過於頻繁（429），請稍等幾秒後再送出。";
+            setStatus("請求過快，請稍後再試");
+          } else if (httpStatus === 400 || httpStatus === 401 || httpStatus === 403) {
+            assistant.message.textContent = "API Key 或權限設定可能有問題，請確認金鑰有效且可用於 Gemini API。";
+            setStatus("API Key 或權限錯誤");
+          } else {
+            assistant.message.textContent = "請求失敗：" + (error.message || "未知錯誤");
+            setStatus("發生錯誤，請檢查 API Key 或網路");
+          }
         }
       } finally {
         sendBtn.disabled = false;
