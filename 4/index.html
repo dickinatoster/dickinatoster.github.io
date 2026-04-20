@@ -583,7 +583,7 @@
         <aside class="sidebar" aria-label="設定側欄">
           <div class="sidebar-card">
             <h2 class="sidebar-title">連線設定</h2>
-            <p class="sidebar-text">支援 Gemini 2.5 Flash 與 Gemini 2.0 Flash，貼上你的 API Key 後即可開始。</p>
+            <p class="sidebar-text">支援 Gemini 2.5 Flash、2.0 Flash 與 1.5 Flash，貼上你的 API Key 後即可開始。</p>
 
             <div class="field">
               <label for="apikey">Gemini API Key</label>
@@ -596,13 +596,15 @@
               <select id="model" class="select">
                 <option value="gemini-2.5-flash" selected>Gemini 2.5 Flash（建議）</option>
                 <option value="gemini-2.0-flash">Gemini 2.0 Flash</option>
+                <option value="gemini-1.5-flash">Gemini 1.5 Flash（高穩定）</option>
               </select>
-              <p class="hint">若 2.5 Flash 在你的帳號區域不可用，可切換到 2.0 Flash。</p>
+              <p class="hint">若 2.5 Flash 在你的帳號區域不可用，可切換到 2.0 或 1.5 Flash。</p>
             </div>
 
             <div class="actions">
               <button class="btn primary" id="applyBtn" type="button">套用設定</button>
               <button class="btn ghost" id="clearBtn" type="button">清除對話</button>
+              <button class="btn ghost" id="demoToggleBtn" type="button">示範模式：關</button>
             </div>
           </div>
 
@@ -647,6 +649,7 @@
     const modelSelect = document.getElementById("model");
     const applyBtn = document.getElementById("applyBtn");
     const clearBtn = document.getElementById("clearBtn");
+    const demoToggleBtn = document.getElementById("demoToggleBtn");
     const stopBtn = document.getElementById("stopBtn");
     const sendBtn = document.getElementById("sendBtn");
     const questionInput = document.getElementById("question");
@@ -659,6 +662,7 @@
 
     const recentQuestions = [];
     let abortController = null;
+    let demoModeEnabled = false;
 
     function modelLabel() {
       const option = modelSelect.options[modelSelect.selectedIndex];
@@ -672,6 +676,10 @@
 
     function setModelHint() {
       modelHintEl.textContent = "目前模型：" + modelLabel();
+    }
+
+    function setDemoToggleLabel() {
+      demoToggleBtn.textContent = "示範模式：" + (demoModeEnabled ? "開" : "關");
     }
 
     function createUserBubble(text) {
@@ -763,14 +771,35 @@
       return textParts.join("\n").trim() || "模型已回應，但內容為空。";
     }
 
-    function getFallbackModel(model) {
-      if (model === "gemini-2.5-flash") {
-        return "gemini-2.0-flash";
+    function buildDemoReply(question, reason) {
+      const cleanedQuestion = question.trim();
+      let core = "【示範模式回覆】\n目前為離線展示內容，非即時 Gemini 回覆。\n\n你問的是：\n" + cleanedQuestion + "\n\n";
+
+      if (cleanedQuestion.includes("台南")) {
+        core += "示範答案：\n台南位於台灣西南部，為台灣六都之一，北接嘉義、南鄰高雄，沿海面向台灣海峽。";
+      } else if (cleanedQuestion.includes("台灣") && cleanedQuestion.includes("哪")) {
+        core += "示範答案：\n台灣位於東亞，介於東海與南海之間，西側為台灣海峽，東側面向太平洋。";
+      } else {
+        core += "示範答案：\n這裡會顯示 AI 的回答內容。正式連線成功時，系統會改為 Gemini 即時回覆。";
       }
-      if (model === "gemini-2.0-flash") {
-        return "gemini-2.5-flash";
+
+      if (reason) {
+        core += "\n\n切換原因：" + reason;
       }
-      return null;
+
+      return core;
+    }
+
+    function getModelCandidates(preferredModel) {
+      const allCandidates = [
+        preferredModel,
+        "gemini-2.0-flash",
+        "gemini-1.5-flash"
+      ];
+
+      return allCandidates.filter((model, index, arr) => {
+        return Boolean(model) && arr.indexOf(model) === index;
+      });
     }
 
     function parseErrorPayload(text) {
@@ -815,8 +844,8 @@
       });
     }
 
-    async function requestGeminiOnce({ model, apiKey, question, signal }) {
-      const endpoint = "https://generativelanguage.googleapis.com/v1beta/models/" + model + ":generateContent?key=" + encodeURIComponent(apiKey);
+    async function requestGeminiOnce({ model, apiKey, question, signal, apiVersion }) {
+      const endpoint = "https://generativelanguage.googleapis.com/" + apiVersion + "/models/" + model + ":generateContent?key=" + encodeURIComponent(apiKey);
       const response = await fetch(endpoint, {
         method: "POST",
         headers: {
@@ -848,40 +877,49 @@
     }
 
     async function requestGeminiWithFallback({ preferredModel, apiKey, question, signal }) {
-      const fallbackModel = getFallbackModel(preferredModel);
-      const modelQueue = fallbackModel ? [preferredModel, fallbackModel] : [preferredModel];
-      const maxRetryPerModel = 3;
+      const modelQueue = getModelCandidates(preferredModel);
+      const versionQueue = ["v1beta", "v1"];
+      const maxRetryPerPair = 4;
       let lastError = null;
 
       for (let modelIndex = 0; modelIndex < modelQueue.length; modelIndex++) {
         const model = modelQueue[modelIndex];
+        for (let versionIndex = 0; versionIndex < versionQueue.length; versionIndex++) {
+          const apiVersion = versionQueue[versionIndex];
 
-        for (let attempt = 1; attempt <= maxRetryPerModel; attempt++) {
-          if (modelIndex > 0 && attempt === 1) {
-            setStatus("模型壅塞，切換到備援模型中...");
-          } else if (attempt > 1) {
-            setStatus("伺服器忙碌，正在重試（第 " + attempt + " 次）...");
-          }
-
-          try {
-            const data = await requestGeminiOnce({ model, apiKey, question, signal });
-            return { data, modelUsed: model, attempts: attempt };
-          } catch (error) {
-            if (error.name === "AbortError") {
-              throw error;
+          for (let attempt = 1; attempt <= maxRetryPerPair; attempt++) {
+            if ((modelIndex > 0 || versionIndex > 0) && attempt === 1) {
+              setStatus("主路徑忙碌，切換備援通道中...");
+            } else if (attempt > 1) {
+              setStatus("伺服器忙碌，正在重試（第 " + attempt + " 次）...");
             }
 
-            lastError = error;
-            const retryable = isRetryableStatus(error.httpStatus);
-            const hasMoreRetryInCurrentModel = attempt < maxRetryPerModel;
+            try {
+              const data = await requestGeminiOnce({
+                model,
+                apiKey,
+                question,
+                signal,
+                apiVersion
+              });
+              return { data, modelUsed: model, apiVersionUsed: apiVersion, attempts: attempt };
+            } catch (error) {
+              if (error.name === "AbortError") {
+                throw error;
+              }
 
-            if (retryable && hasMoreRetryInCurrentModel) {
-              const delay = 600 * attempt;
-              await waitWithAbort(delay, signal);
-              continue;
+              lastError = error;
+              const retryable = isRetryableStatus(error.httpStatus);
+              const hasMoreRetryInCurrentPair = attempt < maxRetryPerPair;
+
+              if (retryable && hasMoreRetryInCurrentPair) {
+                const delay = 700 * Math.pow(2, attempt - 1);
+                await waitWithAbort(delay, signal);
+                continue;
+              }
+
+              break;
             }
-
-            break;
           }
         }
       }
@@ -894,7 +932,7 @@
       const question = questionInput.value.trim();
       const model = modelSelect.value;
 
-      if (!apiKey) {
+      if (!apiKey && !demoModeEnabled) {
         setStatus("請先設定 API Key");
         apikeyInput.focus();
         return;
@@ -913,6 +951,14 @@
       const assistant = createAssistantRow("思考中...");
       chatStage.appendChild(assistant.row);
       scrollToBottom();
+
+      if (!apiKey && demoModeEnabled) {
+        assistant.message.textContent = buildDemoReply(question, "未提供 API Key");
+        setStatus("示範模式已回覆（未連線）");
+        questionInput.value = "";
+        scrollToBottom();
+        return;
+      }
 
       sendBtn.disabled = true;
       abortController = new AbortController();
@@ -935,15 +981,25 @@
           setStatus("已連線，準備就緒");
         }
 
+        if (result.apiVersionUsed !== "v1beta") {
+          assistant.message.textContent += "\n（系統提示：目前使用 API 版本 " + result.apiVersionUsed + "）";
+        }
+
         questionInput.value = "";
       } catch (error) {
         if (error.name === "AbortError") {
           assistant.message.textContent = "已停止等待回覆。";
           setStatus("已中止請求");
         } else {
+          if (demoModeEnabled) {
+            assistant.message.textContent = buildDemoReply(question, "Gemini 服務暫時不可用");
+            setStatus("示範模式已接手回覆");
+            return;
+          }
+
           const httpStatus = error.httpStatus;
           if (httpStatus === 503) {
-            assistant.message.textContent = "目前 Gemini 服務流量過高（503），系統已重試並嘗試備援模型，仍未成功。請稍後再試，或先切換到 Gemini 2.0 Flash。";
+            assistant.message.textContent = "目前 Gemini 服務流量過高（503），系統已重試並嘗試多個備援模型仍未成功。建議先到 Google AI Studio 確認配額與區域可用性，或稍後再試。";
             setStatus("伺服器忙碌中，請稍後再試");
           } else if (httpStatus === 429) {
             assistant.message.textContent = "請求過於頻繁（429），請稍等幾秒後再送出。";
@@ -972,6 +1028,16 @@
       }
     });
 
+    demoToggleBtn.addEventListener("click", () => {
+      demoModeEnabled = !demoModeEnabled;
+      setDemoToggleLabel();
+      if (demoModeEnabled) {
+        setStatus("示範模式已開啟");
+      } else {
+        setStatus(apikeyInput.value.trim() ? "已設定 API Key，可開始提問" : "尚未設定 API Key");
+      }
+    });
+
     clearBtn.addEventListener("click", () => {
       chatStage.innerHTML = "";
       const starter = createAssistantRow("聊天室已清空。你可以繼續提問。");
@@ -997,6 +1063,7 @@
     modelSelect.addEventListener("change", setModelHint);
 
     setModelHint();
+    setDemoToggleLabel();
     updateRecent();
   </script>
 </body>
