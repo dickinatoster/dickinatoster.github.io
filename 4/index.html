@@ -469,6 +469,37 @@
       padding: 4px 0 0;
     }
 
+    .recent-list {
+      margin: 10px 0 0;
+      padding: 0;
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .recent-btn {
+      width: 100%;
+      text-align: left;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      background: rgba(255, 255, 255, 0.04);
+      color: #f2f2f2;
+      border-radius: 12px;
+      padding: 10px 12px;
+      font: inherit;
+      font-size: 0.9rem;
+      line-height: 1.5;
+      cursor: pointer;
+      transition: background 140ms ease, transform 140ms ease;
+    }
+
+    .recent-btn:hover,
+    .recent-btn:focus-visible {
+      background: rgba(255, 255, 255, 0.08);
+      transform: translateY(-1px);
+      outline: none;
+    }
+
     @media (max-width: 1100px) {
       .workspace {
         grid-template-columns: 1fr;
@@ -533,7 +564,7 @@
     <section class="hero" aria-labelledby="page-title">
       <div class="topline">
         <div class="designer">設計者：王怡文</div>
-        <div class="badge">尚未設定 API Key</div>
+        <div class="badge" id="topBadge">尚未設定 API Key</div>
       </div>
 
       <div class="lead">
@@ -563,47 +594,281 @@
             <div class="field">
               <label for="model">模型</label>
               <select id="model" class="select">
-                <option>Gemini 2.5 Flash</option>
-                <option>Gemini 2.0 Flash</option>
+                <option value="gemini-2.5-flash" selected>Gemini 2.5 Flash（建議）</option>
+                <option value="gemini-2.0-flash">Gemini 2.0 Flash</option>
               </select>
               <p class="hint">若 2.5 Flash 在你的帳號區域不可用，可切換到 2.0 Flash。</p>
             </div>
 
             <div class="actions">
-              <button class="btn primary" type="button">套用設定</button>
-              <button class="btn ghost" type="button">清除對話</button>
+              <button class="btn primary" id="applyBtn" type="button">套用設定</button>
+              <button class="btn ghost" id="clearBtn" type="button">清除對話</button>
             </div>
           </div>
 
           <div class="sidebar-card">
             <h2 class="sidebar-title">最近提問</h2>
             <p class="sidebar-text">點一下可直接帶回輸入框。</p>
-            <p class="panel-footer">目前還沒有提問紀錄。</p>
+            <p class="panel-footer" id="recentEmpty">目前還沒有提問紀錄。</p>
+            <ul class="recent-list" id="recentList" aria-label="最近提問清單"></ul>
           </div>
         </aside>
 
         <section class="chat" aria-label="AI 回應視窗">
           <div class="chat-head">
             <h2 class="chat-title">AI回應視窗（設計者 王怡文）</h2>
-            <div class="status">尚未設定 API Key</div>
+            <div class="status" id="status">尚未設定 API Key</div>
           </div>
 
           <div class="chat-body">
-            <div class="chat-stage">
+            <div class="chat-stage" id="chatStage">
+              <div class="avatar-row">
+                <div class="avatar" aria-hidden="true"></div>
+                <div class="assistant-msg">已預設使用 Gemini 2.5 Flash。先貼上 API Key，再輸入問題即可開始。</div>
+              </div>
             </div>
           </div>
 
           <div class="chat-inputbar">
-            <textarea class="composer" aria-label="輸入問題" placeholder="輸入你的問題，按 Enter 送出；Shift + Enter 換行。"></textarea>
+            <textarea class="composer" id="question" aria-label="輸入問題" placeholder="輸入你的問題，按 Enter 送出；Shift + Enter 換行。"></textarea>
             <div class="sendbar">
-              <div class="footnote">目前模型：Gemini 2.5 Flash</div>
-              <button class="btn ghost" type="button">停止等待</button>
-              <button class="btn primary" type="button">送出訊息</button>
+              <div class="footnote" id="modelHint">目前模型：Gemini 2.5 Flash（建議）</div>
+              <button class="btn ghost" id="stopBtn" type="button">停止等待</button>
+              <button class="btn primary" id="sendBtn" type="button">送出訊息</button>
             </div>
           </div>
         </section>
       </div>
     </section>
   </main>
+
+  <script>
+    const apikeyInput = document.getElementById("apikey");
+    const modelSelect = document.getElementById("model");
+    const applyBtn = document.getElementById("applyBtn");
+    const clearBtn = document.getElementById("clearBtn");
+    const stopBtn = document.getElementById("stopBtn");
+    const sendBtn = document.getElementById("sendBtn");
+    const questionInput = document.getElementById("question");
+    const chatStage = document.getElementById("chatStage");
+    const statusEl = document.getElementById("status");
+    const topBadgeEl = document.getElementById("topBadge");
+    const modelHintEl = document.getElementById("modelHint");
+    const recentList = document.getElementById("recentList");
+    const recentEmpty = document.getElementById("recentEmpty");
+
+    const recentQuestions = [];
+    let abortController = null;
+
+    function modelLabel() {
+      const option = modelSelect.options[modelSelect.selectedIndex];
+      return option ? option.textContent : "Gemini 2.5 Flash（建議）";
+    }
+
+    function setStatus(text) {
+      statusEl.textContent = text;
+      topBadgeEl.textContent = text;
+    }
+
+    function setModelHint() {
+      modelHintEl.textContent = "目前模型：" + modelLabel();
+    }
+
+    function createUserBubble(text) {
+      const bubble = document.createElement("div");
+      bubble.className = "user-bubble";
+      bubble.textContent = text;
+      return bubble;
+    }
+
+    function createAssistantRow(text) {
+      const row = document.createElement("div");
+      row.className = "avatar-row";
+
+      const avatar = document.createElement("div");
+      avatar.className = "avatar";
+      avatar.setAttribute("aria-hidden", "true");
+
+      const message = document.createElement("div");
+      message.className = "assistant-msg";
+      message.textContent = text;
+      message.style.whiteSpace = "pre-wrap";
+
+      row.appendChild(avatar);
+      row.appendChild(message);
+
+      return { row, message };
+    }
+
+    function scrollToBottom() {
+      chatStage.scrollTop = chatStage.scrollHeight;
+    }
+
+    function updateRecent() {
+      recentList.innerHTML = "";
+      if (recentQuestions.length === 0) {
+        recentEmpty.style.display = "block";
+        return;
+      }
+
+      recentEmpty.style.display = "none";
+      recentQuestions.forEach((q) => {
+        const li = document.createElement("li");
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "recent-btn";
+        btn.textContent = q;
+        btn.addEventListener("click", () => {
+          questionInput.value = q;
+          questionInput.focus();
+        });
+        li.appendChild(btn);
+        recentList.appendChild(li);
+      });
+    }
+
+    function addRecent(question) {
+      const cleaned = question.trim();
+      if (!cleaned) {
+        return;
+      }
+
+      const sameIndex = recentQuestions.indexOf(cleaned);
+      if (sameIndex >= 0) {
+        recentQuestions.splice(sameIndex, 1);
+      }
+
+      recentQuestions.unshift(cleaned);
+      if (recentQuestions.length > 5) {
+        recentQuestions.pop();
+      }
+      updateRecent();
+    }
+
+    function extractTextFromResponse(data) {
+      const candidates = data && data.candidates;
+      if (!Array.isArray(candidates) || candidates.length === 0) {
+        return "沒有取得可顯示的回覆內容。";
+      }
+
+      const parts = candidates[0].content && candidates[0].content.parts;
+      if (!Array.isArray(parts) || parts.length === 0) {
+        return "模型已回應，但內容為空。";
+      }
+
+      const textParts = parts
+        .map((part) => (typeof part.text === "string" ? part.text : ""))
+        .filter(Boolean);
+
+      return textParts.join("\n").trim() || "模型已回應，但內容為空。";
+    }
+
+    async function sendMessage() {
+      const apiKey = apikeyInput.value.trim();
+      const question = questionInput.value.trim();
+      const model = modelSelect.value;
+
+      if (!apiKey) {
+        setStatus("請先設定 API Key");
+        apikeyInput.focus();
+        return;
+      }
+
+      if (!question) {
+        setStatus("請先輸入問題");
+        questionInput.focus();
+        return;
+      }
+
+      setStatus("等待 Gemini 回覆中...");
+      addRecent(question);
+
+      chatStage.appendChild(createUserBubble(question));
+      const assistant = createAssistantRow("思考中...");
+      chatStage.appendChild(assistant.row);
+      scrollToBottom();
+
+      sendBtn.disabled = true;
+      abortController = new AbortController();
+
+      try {
+        const endpoint = "https://generativelanguage.googleapis.com/v1beta/models/" + model + ":generateContent?key=" + encodeURIComponent(apiKey);
+        const response = await fetch(endpoint, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            contents: [
+              {
+                parts: [
+                  { text: question }
+                ]
+              }
+            ]
+          }),
+          signal: abortController.signal
+        });
+
+        if (!response.ok) {
+          const errorText = await response.text();
+          throw new Error("HTTP " + response.status + " - " + errorText);
+        }
+
+        const data = await response.json();
+        assistant.message.textContent = extractTextFromResponse(data);
+        setStatus("已連線，準備就緒");
+        questionInput.value = "";
+      } catch (error) {
+        if (error.name === "AbortError") {
+          assistant.message.textContent = "已停止等待回覆。";
+          setStatus("已中止請求");
+        } else {
+          assistant.message.textContent = "請求失敗：" + error.message;
+          setStatus("發生錯誤，請檢查 API Key 或網路");
+        }
+      } finally {
+        sendBtn.disabled = false;
+        abortController = null;
+        scrollToBottom();
+      }
+    }
+
+    applyBtn.addEventListener("click", () => {
+      setModelHint();
+      if (apikeyInput.value.trim()) {
+        setStatus("已設定 API Key，可開始提問");
+      } else {
+        setStatus("尚未設定 API Key");
+      }
+    });
+
+    clearBtn.addEventListener("click", () => {
+      chatStage.innerHTML = "";
+      const starter = createAssistantRow("聊天室已清空。你可以繼續提問。");
+      chatStage.appendChild(starter.row);
+      scrollToBottom();
+    });
+
+    stopBtn.addEventListener("click", () => {
+      if (abortController) {
+        abortController.abort();
+      }
+    });
+
+    sendBtn.addEventListener("click", sendMessage);
+
+    questionInput.addEventListener("keydown", (event) => {
+      if (event.key === "Enter" && !event.shiftKey) {
+        event.preventDefault();
+        sendMessage();
+      }
+    });
+
+    modelSelect.addEventListener("change", setModelHint);
+
+    setModelHint();
+    updateRecent();
+  </script>
 </body>
 </html>
