@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 450" role="img" aria-labelledby="title desc">
+  <title id="title">Gemini Chatbot Thumbnail</title>
+  <desc id="desc">A stylized chatbot interface thumbnail</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#161616"/>
+      <stop offset="100%" stop-color="#3a2d1f"/>
+    </linearGradient>
+    <linearGradient id="panel" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#2a2a2a"/>
+      <stop offset="100%" stop-color="#1b1b1b"/>
+    </linearGradient>
+    <linearGradient id="bubble" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#f8f8f8"/>
+      <stop offset="100%" stop-color="#d6d6d6"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="800" height="450" fill="url(#bg)"/>
+  <circle cx="120" cy="90" r="120" fill="#ffffff" opacity="0.08"/>
+  <circle cx="730" cy="390" r="180" fill="#ffffff" opacity="0.06"/>
+
+  <rect x="110" y="70" width="580" height="310" rx="26" fill="url(#panel)" stroke="#ffffff" stroke-opacity="0.12"/>
+  <rect x="140" y="104" width="190" height="26" rx="13" fill="#ffffff" fill-opacity="0.12"/>
+
+  <rect x="140" y="160" width="250" height="56" rx="14" fill="#ffffff" fill-opacity="0.14"/>
+  <rect x="410" y="226" width="250" height="56" rx="14" fill="url(#bubble)"/>
+  <rect x="140" y="292" width="330" height="56" rx="14" fill="#ffffff" fill-opacity="0.14"/>
+
+  <circle cx="440" cy="70" r="22" fill="#ffffff"/>
+  <path d="M429 70h22M440 59v22" stroke="#1a1a1a" stroke-width="4" stroke-linecap="round"/>
+</svg>
