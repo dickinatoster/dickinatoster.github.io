@@ -34,6 +34,16 @@
         <p>在本機開啟此專案後，按下連結即可在新分頁開啟聊天應用：</p>
         <a class="button" href="/5/index.html" target="_blank">打開聊天應用（5/index.html）</a>
 
+        <div style="margin:16px 0; display:flex; gap:12px; flex-wrap:wrap; align-items:flex-start;">
+          <a href="/5/index.html" target="_blank" style="display:block;width:320px;text-decoration:none;color:inherit;">
+            <div style="border-radius:12px;overflow:hidden;border:1px solid #eee;box-shadow:0 8px 18px rgba(0,0,0,0.06);">
+              <img src="assets/chatbot.svg" alt="ntfy 聊天應用縮圖" style="width:100%;height:auto;display:block;aspect-ratio:16/9;object-fit:cover;" />
+            </div>
+            <div style="margin-top:8px;font-weight:700">5. ntfy 聊天應用</div>
+            <div style="color:#666;font-size:0.95rem">單頁聊天 UI，整合 ntfy.sh 發送與 SSE 訂閱</div>
+          </a>
+        </div>
+
         <h3>命令列發送示例</h3>
         <pre>pwsh -NoProfile -ExecutionPolicy Bypass -File .\scripts\send-ntfy.ps1 -Server "https://ntfy.sh" -Topic "drher" -Title "怡文" -Message "測試通知"</pre>
 
