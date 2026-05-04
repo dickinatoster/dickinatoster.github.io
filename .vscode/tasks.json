@@ -1,0 +1,70 @@
+{
+  "version": "2.0.0",
+  "inputs": [
+    {
+      "id": "ntfyServer",
+      "type": "promptString",
+      "description": "ntfy server",
+      "default": "https://ntfy.sh"
+    },
+    {
+      "id": "ntfyTopic",
+      "type": "promptString",
+      "description": "ntfy topic",
+      "default": "my-topic"
+    },
+    {
+      "id": "ntfyTitle",
+      "type": "promptString",
+      "description": "notification title",
+      "default": "怡文"
+    },
+    {
+      "id": "ntfyMessage",
+      "type": "promptString",
+      "description": "notification message",
+      "default": "Hello from VS Code"
+    },
+    {
+      "id": "ntfyPriority",
+      "type": "pickString",
+      "description": "priority",
+      "options": ["min", "low", "default", "high", "max"],
+      "default": "default"
+    },
+    {
+      "id": "ntfyTags",
+      "type": "promptString",
+      "description": "tags (comma-separated)",
+      "default": ""
+    }
+  ],
+  "tasks": [
+    {
+      "label": "ntfy: send notification",
+      "type": "shell",
+      "command": "pwsh",
+      "args": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "${workspaceFolder}/scripts/send-ntfy.ps1",
+        "-Server",
+        "${input:ntfyServer}",
+        "-Topic",
+        "${input:ntfyTopic}",
+        "-Title",
+        "${input:ntfyTitle}",
+        "-Message",
+        "${input:ntfyMessage}",
+        "-Priority",
+        "${input:ntfyPriority}",
+        "-Tags",
+        "${input:ntfyTags}"
+      ],
+      "group": "none",
+      "problemMatcher": []
+    }
+  ]
+}

@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>作品集 — Dick in a Toaster</title>
+  <style>
+    body{font-family:Arial,Helvetica,sans-serif;background:#f5f5f7;color:#111;margin:0;padding:40px}
+    .card{max-width:980px;margin:20px auto;padding:20px;background:#fff;border-radius:12px;box-shadow:0 6px 20px rgba(0,0,0,0.08)}
+    h1{margin:0 0 10px}
+    .meta{color:#666;font-size:0.95rem}
+    a.button{display:inline-block;margin-top:12px;padding:10px 14px;background:#4ea6d6;color:#fff;border-radius:8px;text-decoration:none}
+    .grid{display:grid;grid-template-columns:1fr 320px;gap:20px}
+    pre{background:#fafafa;padding:12px;border-radius:8px;overflow:auto}
+  </style>
+</head>
+<body>
+  <main class="card">
+    <div class="grid">
+      <section>
+        <h1>聊天應用 — ntfy.sh 即時通知整合</h1>
+        <div class="meta">技術：HTML / CSS / JavaScript / ntfy.sh / PowerShell</div>
+        <p>這個範例示範如何使用 <a href="https://ntfy.sh" target="_blank" rel="noreferrer">ntfy.sh</a> 提供簡單的 Publish/Subscribe 通知功能，並把它嵌入單頁聊天介面。使用者可以直接於瀏覽器連線訂閱主題，或由腳本與 VS Code 任務發送通知。</p>
+
+        <h3>特色</h3>
+        <ul>
+          <li>HTTPS 發送（POST）到 ntfy.sh</li>
+          <li>Server-Sent Events (SSE) 訂閱（/sse）即時接收</li>
+          <li>支援中文主題（URL 編碼）與錯誤處理</li>
+          <li>含 PowerShell 腳本 `scripts/send-ntfy.ps1` 與 VS Code 任務範本</li>
+        </ul>
+
+        <h3>快速示範</h3>
+        <p>在本機開啟此專案後，按下連結即可在新分頁開啟聊天應用：</p>
+        <a class="button" href="/5/index.html" target="_blank">打開聊天應用（5/index.html）</a>
+
+        <h3>命令列發送示例</h3>
+        <pre>pwsh -NoProfile -ExecutionPolicy Bypass -File .\scripts\send-ntfy.ps1 -Server "https://ntfy.sh" -Topic "drher" -Title "怡文" -Message "測試通知"</pre>
+
+        <h3>注意</h3>
+        <p>若使用自有 ntfy 伺服器，請在 Server 欄輸入完整 URL（例如 https://ntfy.example.com）。若使用本機的自訂主機名稱（如 drher），請確保 DNS/hosts 有對應。</p>
+      </section>
+
+      <aside>
+        <h4>檔案</h4>
+        <ul>
+          <li><a href="/5/index.html">5/index.html</a> — 聊天應用主頁</li>
+          <li><a href="/scripts/send-ntfy.ps1">scripts/send-ntfy.ps1</a> — PowerShell 發送腳本</li>
+          <li><a href="/.vscode/tasks.json">.vscode/tasks.json</a> — VS Code 任務設定</li>
+        </ul>
+
+        <h4>說明檔</h4>
+        <a class="button" href="/5/README.md" target="_blank">聊天應用說明</a>
+      </aside>
+    </div>
+  </main>
+</body>
+</html>
