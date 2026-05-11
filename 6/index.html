@@ -582,7 +582,7 @@
                 const reader = new FileReader();
                 reader.onload = function(evt) {
                     const content = evt.target.result;
-                    document.getElementById('editor').value = content;
+                    setEditorContent(content);
                     document.getElementById('filename').value = file.name;
                     // 使用檔案的最後修改時間作為最後修改顯示
                     try {
@@ -679,24 +679,57 @@
             }, 3000);
         }
 
+        // 將內容安全地設定到 editor：支援字串或物件
+        function setEditorContent(value) {
+            const editor = document.getElementById('editor');
+            if (!editor) return;
+            if (value === null || value === undefined) {
+                editor.value = '';
+                return;
+            }
+            if (typeof value === 'string') {
+                editor.value = value;
+                return;
+            }
+            // 如果是物件，嘗試取 `content` 欄位，沒有就用 JSON 字串化（可讀）
+            try {
+                if (typeof value === 'object') {
+                    if (value.content && typeof value.content === 'string') {
+                        editor.value = value.content;
+                    } else {
+                        editor.value = JSON.stringify(value, null, 2);
+                    }
+                } else {
+                    editor.value = String(value);
+                }
+            } catch (e) {
+                editor.value = String(value);
+            }
+        }
+
         // 儲存檔案到本機（優先使用 File System Access API）
         async function saveToFile(filename, content) {
-            // 如果支援 File System Access API，嘗試使用 save file picker
+            // 如果支援 File System Access API，先嘗試使用 save file picker
             if (window.showSaveFilePicker) {
-                const opts = {
-                    suggestedName: filename,
-                    types: [
-                        {
-                            description: 'Text Files',
-                            accept: { 'text/plain': ['.txt'] }
-                        }
-                    ]
-                };
-                const handle = await window.showSaveFilePicker(opts);
-                const writable = await handle.createWritable();
-                await writable.write(content);
-                await writable.close();
-                return;
+                try {
+                    const opts = {
+                        suggestedName: filename,
+                        types: [
+                            {
+                                description: 'Text Files',
+                                accept: { 'text/plain': ['.txt'] }
+                            }
+                        ]
+                    };
+                    const handle = await window.showSaveFilePicker(opts);
+                    const writable = await handle.createWritable();
+                    await writable.write(content);
+                    await writable.close();
+                    return;
+                } catch (err) {
+                    // 如果使用者取消或 API 被攔截，回退到 blob 下載
+                    console.warn('showSaveFilePicker failed, falling back to blob download', err);
+                }
             }
 
             // 備援：建立 blob 並觸發下載
