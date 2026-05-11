@@ -1,87 +1,121 @@
 <svg width="320" height="320" viewBox="0 0 320 320" fill="none" xmlns="http://www.w3.org/2000/svg">
   <defs>
-    <radialGradient id="mainPad" cx="0.35" cy="0.32" r="0.68">
-      <stop offset="0%" stop-color="#FFCBB4"/>
-      <stop offset="60%" stop-color="#F4A89D"/>
-      <stop offset="100%" stop-color="#E58580"/>
+    <radialGradient id="skyGrad" cx="0.5" cy="0.3" r="0.8">
+      <stop offset="0%" stop-color="#E8F4FD"/>
+      <stop offset="60%" stop-color="#B3E5FC"/>
+      <stop offset="100%" stop-color="#81D4FA"/>
     </radialGradient>
-    <radialGradient id="toe" cx="0.32" cy="0.3" r="0.72">
-      <stop offset="0%" stop-color="#FFDFC7"/>
-      <stop offset="70%" stop-color="#F7A693"/>
-      <stop offset="100%" stop-color="#E87968"/>
+    <radialGradient id="pinkFlower" cx="0.35" cy="0.35" r="0.65">
+      <stop offset="0%" stop-color="#FFE5F0"/>
+      <stop offset="50%" stop-color="#FFB3D9"/>
+      <stop offset="100%" stop-color="#FF99CC"/>
+    </radialGradient>
+    <radialGradient id="whiteFlower" cx="0.35" cy="0.35" r="0.65">
+      <stop offset="0%" stop-color="#FFFBFE"/>
+      <stop offset="50%" stop-color="#FFF0F7"/>
+      <stop offset="100%" stop-color="#FFE0ED"/>
     </radialGradient>
     <filter id="shadow" x="-50%" y="-50%" width="200%" height="200%">
-      <feDropShadow dx="1" dy="2" stdDeviation="1.5" flood-opacity="0.25"/>
+      <feDropShadow dx="0.5" dy="1" stdDeviation="0.8" flood-opacity="0.15"/>
     </filter>
   </defs>
 
-  <rect width="320" height="320" fill="transparent"/>
-
-  <!-- Lulu 豬 1 - 大豬睡覺 -->
-  <g opacity="0.68" transform="translate(50 80)" filter="url(#shadow)">
-    <!-- 身體 -->
-    <ellipse cx="0" cy="0" rx="48" ry="35" fill="#F8D9E8" stroke="#C4A5B5" stroke-width="2.2"/>
-    <!-- 頭 -->
-    <circle cx="-32" cy="-18" r="28" fill="#F5D4E3" stroke="#C4A5B5" stroke-width="2"/>
-    <!-- 耳朵 -->
-    <circle cx="-48" cy="-28" r="10" fill="#F5D4E3" stroke="#C4A5B5" stroke-width="1.5"/>
-    <circle cx="-16" cy="-40" r="8" fill="#F5D4E3" stroke="#C4A5B5" stroke-width="1.5"/>
-    <!-- 鼻子 -->
-    <circle cx="-38" cy="-10" r="6" fill="#F0B8D5" stroke="#C4A5B5" stroke-width="1"/>
-    <!-- 眼睛（閉著）-->
-    <path d="M -42,-24 Q -40,-22 -38,-24" stroke="#C4A5B5" stroke-width="1.5" fill="none" stroke-linecap="round"/>
-    <!-- 嘴 -->
-    <path d="M -38,-6 Q -36,-2 -34,-4" stroke="#C4A5B5" stroke-width="1.2" fill="none" stroke-linecap="round"/>
-    <!-- 腮紅 -->
-    <circle cx="-58" cy="-8" r="8" fill="#FFC0D9" opacity="0.6"/>
+  <!-- 天空背景 -->
+  <rect width="320" height="320" fill="url(#skyGrad)"/>
+  
+  <!-- 白云 -->
+  <g opacity="0.4">
+    <ellipse cx="60" cy="40" rx="35" ry="20" fill="#FFFFFF"/>
+    <ellipse cx="90" cy="38" rx="30" ry="18" fill="#FFFFFF"/>
+    <ellipse cx="240" cy="100" rx="40" ry="22" fill="#FFFFFF"/>
+    <ellipse cx="280" cy="105" rx="35" ry="20" fill="#FFFFFF"/>
   </g>
 
-  <!-- Lulu 豬 2 - 中豬 -->
-  <g opacity="0.55" transform="translate(290 185) scale(0.75)" filter="url(#shadow)">
-    <ellipse cx="0" cy="0" rx="48" ry="35" fill="#F8D9E8" stroke="#C4A5B5" stroke-width="2.2"/>
-    <circle cx="-32" cy="-18" r="28" fill="#F5D4E3" stroke="#C4A5B5" stroke-width="2"/>
-    <circle cx="-48" cy="-28" r="10" fill="#F5D4E3" stroke="#C4A5B5" stroke-width="1.5"/>
-    <circle cx="-16" cy="-40" r="8" fill="#F5D4E3" stroke="#C4A5B5" stroke-width="1.5"/>
-    <circle cx="-38" cy="-10" r="6" fill="#F0B8D5" stroke="#C4A5B5" stroke-width="1"/>
-    <path d="M -42,-24 Q -40,-22 -38,-24" stroke="#C4A5B5" stroke-width="1.5" fill="none" stroke-linecap="round"/>
-    <path d="M -38,-6 Q -36,-2 -34,-4" stroke="#C4A5B5" stroke-width="1.2" fill="none" stroke-linecap="round"/>
-    <circle cx="-58" cy="-8" r="8" fill="#FFC0D9" opacity="0.6"/>
+  <!-- 樱花群 1 - 左上 -->
+  <g opacity="0.8" transform="translate(40 50)" filter="url(#shadow)">
+    <!-- 樱花簇 -->
+    <circle cx="0" cy="0" r="3" fill="#90C695"/>
+    <circle cx="5" cy="-2" r="3" fill="#90C695"/>
+    <circle cx="-5" cy="-2" r="3" fill="#90C695"/>
+    
+    <!-- 花朵层 1 -->
+    <circle cx="2" cy="3" r="5.5" fill="url(#pinkFlower)" stroke="#FFB3D9" stroke-width="0.8"/>
+    <circle cx="2" cy="3" r="4" fill="none" stroke="#FF99CC" stroke-width="0.5" opacity="0.6"/>
+    
+    <!-- 花瓣细节 -->
+    <circle cx="0" cy="2" r="1.5" fill="#FF99CC" opacity="0.5"/>
+    <circle cx="4" cy="2" r="1.5" fill="#FF99CC" opacity="0.5"/>
+    <circle cx="2" cy="0" r="1.5" fill="#FFE5F0" opacity="0.7"/>
+    <circle cx="2" cy="4.5" r="1.2" fill="#FF99CC" opacity="0.5"/>
   </g>
 
-  <!-- Lulu 豬 3 - 小豬 -->
-  <g opacity="0.62" transform="translate(165 290) scale(0.65)" filter="url(#shadow)">
-    <ellipse cx="0" cy="0" rx="48" ry="35" fill="#F8D9E8" stroke="#C4A5B5" stroke-width="2.2"/>
-    <circle cx="-32" cy="-18" r="28" fill="#F5D4E3" stroke="#C4A5B5" stroke-width="2"/>
-    <circle cx="-48" cy="-28" r="10" fill="#F5D4E3" stroke="#C4A5B5" stroke-width="1.5"/>
-    <circle cx="-16" cy="-40" r="8" fill="#F5D4E3" stroke="#C4A5B5" stroke-width="1.5"/>
-    <circle cx="-38" cy="-10" r="6" fill="#F0B8D5" stroke="#C4A5B5" stroke-width="1"/>
-    <path d="M -42,-24 Q -40,-22 -38,-24" stroke="#C4A5B5" stroke-width="1.5" fill="none" stroke-linecap="round"/>
-    <path d="M -38,-6 Q -36,-2 -34,-4" stroke="#C4A5B5" stroke-width="1.2" fill="none" stroke-linecap="round"/>
-    <circle cx="-58" cy="-8" r="8" fill="#FFC0D9" opacity="0.6"/>
+  <!-- 樱花群 2 - 右上 -->
+  <g opacity="0.75" transform="translate(270 45)" filter="url(#shadow)">
+    <circle cx="0" cy="0" r="3" fill="#90C695"/>
+    <circle cx="5" cy="-2" r="3" fill="#90C695"/>
+    <circle cx="-5" cy="-2" r="3" fill="#90C695"/>
+    
+    <circle cx="2" cy="3" r="5.5" fill="url(#whiteFlower)" stroke="#FFE0ED" stroke-width="0.8"/>
+    <circle cx="2" cy="3" r="4" fill="none" stroke="#FFFFFF" stroke-width="0.5" opacity="0.6"/>
+    
+    <circle cx="0" cy="2" r="1.5" fill="#FFE0ED" opacity="0.5"/>
+    <circle cx="4" cy="2" r="1.5" fill="#FFE0ED" opacity="0.5"/>
+    <circle cx="2" cy="0" r="1.5" fill="#FFFBFE" opacity="0.7"/>
+    <circle cx="2" cy="4.5" r="1.2" fill="#FFE0ED" opacity="0.5"/>
   </g>
 
-  <!-- Lulu 豬 4 - 中小豬 -->
-  <g opacity="0.50" transform="translate(250 45) scale(0.7)" filter="url(#shadow)">
-    <ellipse cx="0" cy="0" rx="48" ry="35" fill="#F8D9E8" stroke="#C4A5B5" stroke-width="2.2"/>
-    <circle cx="-32" cy="-18" r="28" fill="#F5D4E3" stroke="#C4A5B5" stroke-width="2"/>
-    <circle cx="-48" cy="-28" r="10" fill="#F5D4E3" stroke="#C4A5B5" stroke-width="1.5"/>
-    <circle cx="-16" cy="-40" r="8" fill="#F5D4E3" stroke="#C4A5B5" stroke-width="1.5"/>
-    <circle cx="-38" cy="-10" r="6" fill="#F0B8D5" stroke="#C4A5B5" stroke-width="1"/>
-    <path d="M -42,-24 Q -40,-22 -38,-24" stroke="#C4A5B5" stroke-width="1.5" fill="none" stroke-linecap="round"/>
-    <path d="M -38,-6 Q -36,-2 -34,-4" stroke="#C4A5B5" stroke-width="1.2" fill="none" stroke-linecap="round"/>
-    <circle cx="-58" cy="-8" r="8" fill="#FFC0D9" opacity="0.6"/>
+  <!-- 樱花群 3 - 左下 -->
+  <g opacity="0.7" transform="translate(50 260)" filter="url(#shadow)">
+    <circle cx="0" cy="0" r="3" fill="#90C695"/>
+    <circle cx="5" cy="-2" r="3" fill="#90C695"/>
+    <circle cx="-5" cy="-2" r="3" fill="#90C695"/>
+    
+    <circle cx="2" cy="3" r="5.5" fill="url(#pinkFlower)" stroke="#FFB3D9" stroke-width="0.8"/>
+    <circle cx="2" cy="3" r="4" fill="none" stroke="#FF99CC" stroke-width="0.5" opacity="0.6"/>
+    
+    <circle cx="0" cy="2" r="1.5" fill="#FF99CC" opacity="0.5"/>
+    <circle cx="4" cy="2" r="1.5" fill="#FF99CC" opacity="0.5"/>
+    <circle cx="2" cy="0" r="1.5" fill="#FFE5F0" opacity="0.7"/>
+    <circle cx="2" cy="4.5" r="1.2" fill="#FF99CC" opacity="0.5"/>
   </g>
 
-  <!-- 迷你 Lulu 豬 -->
-  <g opacity="0.22" transform="translate(120 150) scale(0.5)" filter="url(#shadow)">
-    <ellipse cx="0" cy="0" rx="48" ry="35" fill="#F8D9E8" stroke="#C4A5B5" stroke-width="2.2"/>
-    <circle cx="-32" cy="-18" r="28" fill="#F5D4E3" stroke="#C4A5B5" stroke-width="2"/>
-    <circle cx="-48" cy="-28" r="10" fill="#F5D4E3" stroke="#C4A5B5" stroke-width="1.5"/>
-    <circle cx="-16" cy="-40" r="8" fill="#F5D4E3" stroke="#C4A5B5" stroke-width="1.5"/>
-    <circle cx="-38" cy="-10" r="6" fill="#F0B8D5" stroke="#C4A5B5" stroke-width="1"/>
-    <path d="M -42,-24 Q -40,-22 -38,-24" stroke="#C4A5B5" stroke-width="1.5" fill="none" stroke-linecap="round"/>
-    <path d="M -38,-6 Q -36,-2 -34,-4" stroke="#C4A5B5" stroke-width="1.2" fill="none" stroke-linecap="round"/>
-    <circle cx="-58" cy="-8" r="8" fill="#FFC0D9" opacity="0.6"/>
+  <!-- 樱花群 4 - 右下 -->
+  <g opacity="0.72" transform="translate(280 280)" filter="url(#shadow)">
+    <circle cx="0" cy="0" r="3" fill="#90C695"/>
+    <circle cx="5" cy="-2" r="3" fill="#90C695"/>
+    <circle cx="-5" cy="-2" r="3" fill="#90C695"/>
+    
+    <circle cx="2" cy="3" r="5.5" fill="url(#whiteFlower)" stroke="#FFE0ED" stroke-width="0.8"/>
+    <circle cx="2" cy="3" r="4" fill="none" stroke="#FFFFFF" stroke-width="0.5" opacity="0.6"/>
+    
+    <circle cx="0" cy="2" r="1.5" fill="#FFE0ED" opacity="0.5"/>
+    <circle cx="4" cy="2" r="1.5" fill="#FFE0ED" opacity="0.5"/>
+    <circle cx="2" cy="0" r="1.5" fill="#FFFBFE" opacity="0.7"/>
+    <circle cx="2" cy="4.5" r="1.2" fill="#FFE0ED" opacity="0.5"/>
   </g>
 
-</svg>
+  <!-- 散落花瓣 -->
+  <g opacity="0.5">
+    <circle cx="80" cy="80" r="2.5" fill="#FFB3D9"/>
+    <circle cx="200" cy="120" r="2" fill="#FFE0ED"/>
+    <circle cx="150" cy="180" r="2.2" fill="#FFB3D9"/>
+    <circle cx="100" cy="200" r="1.8" fill="#FFE0ED"/>
+    <circle cx="220" cy="200" r="2.3" fill="#FFB3D9"/>
+    <circle cx="160" cy="250" r="2" fill="#FFE0ED"/>
+  </g>
+
+  <!-- 中心装饰樱花 -->
+  <g opacity="0.65" transform="translate(160 160)" filter="url(#shadow)">
+    <circle cx="0" cy="0" r="3.5" fill="#90C695"/>
+    <circle cx="6" cy="-2.5" r="3" fill="#90C695"/>
+    <circle cx="-6" cy="-2.5" r="3" fill="#90C695"/>
+    
+    <circle cx="2.5" cy="4" r="6.5" fill="url(#pinkFlower)" stroke="#FFB3D9" stroke-width="1"/>
+    <circle cx="2.5" cy="4" r="4.5" fill="none" stroke="#FF99CC" stroke-width="0.6" opacity="0.6"/>
+    
+    <circle cx="0" cy="2.5" r="1.8" fill="#FF99CC" opacity="0.6"/>
+    <circle cx="5" cy="2.5" r="1.8" fill="#FF99CC" opacity="0.6"/>
+    <circle cx="2.5" cy="0.5" r="1.8" fill="#FFE5F0" opacity="0.8"/>
+    <circle cx="2.5" cy="5.5" r="1.4" fill="#FF99CC" opacity="0.6"/>
+  </g>
+
