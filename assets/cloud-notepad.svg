@@ -1,0 +1,39 @@
+<svg width="1280" height="720" viewBox="0 0 1280 720" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#6f7ef7"/>
+      <stop offset="100%" stop-color="#b98be8"/>
+    </linearGradient>
+    <linearGradient id="panel" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.96"/>
+      <stop offset="100%" stop-color="#f7f4ff" stop-opacity="0.98"/>
+    </linearGradient>
+  </defs>
+  <rect width="1280" height="720" rx="48" fill="url(#bg)"/>
+  <circle cx="210" cy="160" r="86" fill="#ffffff" fill-opacity="0.14"/>
+  <circle cx="1090" cy="120" r="110" fill="#ffffff" fill-opacity="0.1"/>
+  <circle cx="1020" cy="590" r="140" fill="#ffffff" fill-opacity="0.08"/>
+
+  <rect x="138" y="92" width="1004" height="536" rx="34" fill="url(#panel)"/>
+  <rect x="138" y="92" width="1004" height="84" rx="34" fill="#6e7bda"/>
+  <rect x="138" y="142" width="1004" height="34" fill="#6e7bda"/>
+
+  <circle cx="208" cy="134" r="12" fill="#ffffff" fill-opacity="0.8"/>
+  <circle cx="236" cy="134" r="12" fill="#ffffff" fill-opacity="0.55"/>
+  <circle cx="264" cy="134" r="12" fill="#ffffff" fill-opacity="0.35"/>
+  <text x="296" y="145" fill="#ffffff" font-family="Arial, sans-serif" font-size="34" font-weight="700">雲端記事本</text>
+
+  <rect x="176" y="218" width="928" height="380" rx="18" fill="#ffffff" stroke="#d9d5f2" stroke-width="4"/>
+  <rect x="206" y="246" width="188" height="22" rx="11" fill="#c6d1ff"/>
+  <rect x="206" y="298" width="760" height="18" rx="9" fill="#ece8ff"/>
+  <rect x="206" y="332" width="668" height="18" rx="9" fill="#ece8ff"/>
+  <rect x="206" y="366" width="708" height="18" rx="9" fill="#ece8ff"/>
+  <rect x="206" y="400" width="536" height="18" rx="9" fill="#ece8ff"/>
+  <rect x="206" y="434" width="642" height="18" rx="9" fill="#ece8ff"/>
+  <rect x="206" y="468" width="592" height="18" rx="9" fill="#ece8ff"/>
+  <rect x="206" y="522" width="180" height="36" rx="18" fill="#7b84e8"/>
+  <rect x="400" y="522" width="180" height="36" rx="18" fill="#9f7fe8"/>
+
+  <circle cx="994" cy="530" r="50" fill="#7dd3a8" fill-opacity="0.95"/>
+  <path d="M972 531L988 547L1018 516" stroke="#ffffff" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
