@@ -1,0 +1,87 @@
+<svg width="320" height="320" viewBox="0 0 320 320" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="mainPad" cx="0.35" cy="0.32" r="0.68">
+      <stop offset="0%" stop-color="#FFCBB4"/>
+      <stop offset="60%" stop-color="#F4A89D"/>
+      <stop offset="100%" stop-color="#E58580"/>
+    </radialGradient>
+    <radialGradient id="toe" cx="0.32" cy="0.3" r="0.72">
+      <stop offset="0%" stop-color="#FFDFC7"/>
+      <stop offset="70%" stop-color="#F7A693"/>
+      <stop offset="100%" stop-color="#E87968"/>
+    </radialGradient>
+    <filter id="shadow" x="-50%" y="-50%" width="200%" height="200%">
+      <feDropShadow dx="1" dy="2" stdDeviation="1.5" flood-opacity="0.25"/>
+    </filter>
+  </defs>
+
+  <rect width="320" height="320" fill="transparent"/>
+
+  <!-- Lulu 豬 1 - 大豬睡覺 -->
+  <g opacity="0.68" transform="translate(50 80)" filter="url(#shadow)">
+    <!-- 身體 -->
+    <ellipse cx="0" cy="0" rx="48" ry="35" fill="#F8D9E8" stroke="#C4A5B5" stroke-width="2.2"/>
+    <!-- 頭 -->
+    <circle cx="-32" cy="-18" r="28" fill="#F5D4E3" stroke="#C4A5B5" stroke-width="2"/>
+    <!-- 耳朵 -->
+    <circle cx="-48" cy="-28" r="10" fill="#F5D4E3" stroke="#C4A5B5" stroke-width="1.5"/>
+    <circle cx="-16" cy="-40" r="8" fill="#F5D4E3" stroke="#C4A5B5" stroke-width="1.5"/>
+    <!-- 鼻子 -->
+    <circle cx="-38" cy="-10" r="6" fill="#F0B8D5" stroke="#C4A5B5" stroke-width="1"/>
+    <!-- 眼睛（閉著）-->
+    <path d="M -42,-24 Q -40,-22 -38,-24" stroke="#C4A5B5" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+    <!-- 嘴 -->
+    <path d="M -38,-6 Q -36,-2 -34,-4" stroke="#C4A5B5" stroke-width="1.2" fill="none" stroke-linecap="round"/>
+    <!-- 腮紅 -->
+    <circle cx="-58" cy="-8" r="8" fill="#FFC0D9" opacity="0.6"/>
+  </g>
+
+  <!-- Lulu 豬 2 - 中豬 -->
+  <g opacity="0.55" transform="translate(290 185) scale(0.75)" filter="url(#shadow)">
+    <ellipse cx="0" cy="0" rx="48" ry="35" fill="#F8D9E8" stroke="#C4A5B5" stroke-width="2.2"/>
+    <circle cx="-32" cy="-18" r="28" fill="#F5D4E3" stroke="#C4A5B5" stroke-width="2"/>
+    <circle cx="-48" cy="-28" r="10" fill="#F5D4E3" stroke="#C4A5B5" stroke-width="1.5"/>
+    <circle cx="-16" cy="-40" r="8" fill="#F5D4E3" stroke="#C4A5B5" stroke-width="1.5"/>
+    <circle cx="-38" cy="-10" r="6" fill="#F0B8D5" stroke="#C4A5B5" stroke-width="1"/>
+    <path d="M -42,-24 Q -40,-22 -38,-24" stroke="#C4A5B5" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+    <path d="M -38,-6 Q -36,-2 -34,-4" stroke="#C4A5B5" stroke-width="1.2" fill="none" stroke-linecap="round"/>
+    <circle cx="-58" cy="-8" r="8" fill="#FFC0D9" opacity="0.6"/>
+  </g>
+
+  <!-- Lulu 豬 3 - 小豬 -->
+  <g opacity="0.62" transform="translate(165 290) scale(0.65)" filter="url(#shadow)">
+    <ellipse cx="0" cy="0" rx="48" ry="35" fill="#F8D9E8" stroke="#C4A5B5" stroke-width="2.2"/>
+    <circle cx="-32" cy="-18" r="28" fill="#F5D4E3" stroke="#C4A5B5" stroke-width="2"/>
+    <circle cx="-48" cy="-28" r="10" fill="#F5D4E3" stroke="#C4A5B5" stroke-width="1.5"/>
+    <circle cx="-16" cy="-40" r="8" fill="#F5D4E3" stroke="#C4A5B5" stroke-width="1.5"/>
+    <circle cx="-38" cy="-10" r="6" fill="#F0B8D5" stroke="#C4A5B5" stroke-width="1"/>
+    <path d="M -42,-24 Q -40,-22 -38,-24" stroke="#C4A5B5" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+    <path d="M -38,-6 Q -36,-2 -34,-4" stroke="#C4A5B5" stroke-width="1.2" fill="none" stroke-linecap="round"/>
+    <circle cx="-58" cy="-8" r="8" fill="#FFC0D9" opacity="0.6"/>
+  </g>
+
+  <!-- Lulu 豬 4 - 中小豬 -->
+  <g opacity="0.50" transform="translate(250 45) scale(0.7)" filter="url(#shadow)">
+    <ellipse cx="0" cy="0" rx="48" ry="35" fill="#F8D9E8" stroke="#C4A5B5" stroke-width="2.2"/>
+    <circle cx="-32" cy="-18" r="28" fill="#F5D4E3" stroke="#C4A5B5" stroke-width="2"/>
+    <circle cx="-48" cy="-28" r="10" fill="#F5D4E3" stroke="#C4A5B5" stroke-width="1.5"/>
+    <circle cx="-16" cy="-40" r="8" fill="#F5D4E3" stroke="#C4A5B5" stroke-width="1.5"/>
+    <circle cx="-38" cy="-10" r="6" fill="#F0B8D5" stroke="#C4A5B5" stroke-width="1"/>
+    <path d="M -42,-24 Q -40,-22 -38,-24" stroke="#C4A5B5" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+    <path d="M -38,-6 Q -36,-2 -34,-4" stroke="#C4A5B5" stroke-width="1.2" fill="none" stroke-linecap="round"/>
+    <circle cx="-58" cy="-8" r="8" fill="#FFC0D9" opacity="0.6"/>
+  </g>
+
+  <!-- 迷你 Lulu 豬 -->
+  <g opacity="0.22" transform="translate(120 150) scale(0.5)" filter="url(#shadow)">
+    <ellipse cx="0" cy="0" rx="48" ry="35" fill="#F8D9E8" stroke="#C4A5B5" stroke-width="2.2"/>
+    <circle cx="-32" cy="-18" r="28" fill="#F5D4E3" stroke="#C4A5B5" stroke-width="2"/>
+    <circle cx="-48" cy="-28" r="10" fill="#F5D4E3" stroke="#C4A5B5" stroke-width="1.5"/>
+    <circle cx="-16" cy="-40" r="8" fill="#F5D4E3" stroke="#C4A5B5" stroke-width="1.5"/>
+    <circle cx="-38" cy="-10" r="6" fill="#F0B8D5" stroke="#C4A5B5" stroke-width="1"/>
+    <path d="M -42,-24 Q -40,-22 -38,-24" stroke="#C4A5B5" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+    <path d="M -38,-6 Q -36,-2 -34,-4" stroke="#C4A5B5" stroke-width="1.2" fill="none" stroke-linecap="round"/>
+    <circle cx="-58" cy="-8" r="8" fill="#FFC0D9" opacity="0.6"/>
+  </g>
+
+</svg>
