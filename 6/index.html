@@ -422,19 +422,7 @@
         最後修改時間： <span id="bottomLeftModified">未修改</span>
     </div>
 
-    <!-- Save 對話框 -->
-    <div class="modal" id="saveModal">
-        <div class="modal-content">
-            <h2>💾 Save</h2>
-            <p>輸入要儲存的檔案名稱：</p>
-            <label>檔案名稱</label>
-            <input type="text" id="saveFilename" placeholder="記事本.txt">
-            <div class="modal-buttons">
-                <button class="btn-cancel" onclick="closeSaveModal()">取消</button>
-                <button class="btn-confirm" onclick="confirmSave()">儲存</button>
-            </div>
-        </div>
-    </div>
+    <!-- 移除舊有的 Save 對話框：改為直接儲存（若在 GAS 環境則呼叫 google.script.run） -->
 
     <!-- 隱藏的本機檔案選擇器，用於載入 .txt 檔案 -->
     <input type="file" id="filePicker" accept=".txt,text/plain" style="display:none" />
@@ -457,6 +445,7 @@
             loadLocalStorage();
             setupEventListeners();
             updateStatusIndicator();
+            startAutoSave();
         }
 
         // ============ 事件監聽器 ============
@@ -483,59 +472,104 @@
                 }
             });
 
-            document.getElementById('saveFilename').addEventListener('keydown', (e) => {
-                if (e.key === 'Enter') {
-                    e.preventDefault();
-                    confirmSave();
-                }
-            });
+            // 不再使用檔名輸入的模態窗，Save 會直接儲存到後端或本機
         }
 
         // ============ 檔案操作 ============
         function handleSave() {
-            const currentName = document.getElementById('filename').value || '記事本.txt';
-            document.getElementById('saveFilename').value = currentName;
-            document.getElementById('saveModal').classList.add('active');
-            document.getElementById('saveFilename').focus();
-            document.getElementById('saveFilename').select();
-        }
+            // 直接儲存：若在 Apps Script 環境，呼叫後端 saveNotebook
+            const content = document.getElementById('editor').value;
+            const filename = document.getElementById('filename').value || '記事本.txt';
 
-        function closeSaveModal() {
-            document.getElementById('saveModal').classList.remove('active');
-        }
+            // 優先呼叫 Apps Script 的後端方法（當頁面由 GAS doGet 載入時可用）
+            if (window.google && google.script && google.script.run) {
+                // 更新本地狀態
+                saveToLocalStorage();
+                hasUnsavedChanges = false;
+                updateStatusIndicator();
 
-        function confirmSave() {
-            const filename = document.getElementById('saveFilename').value.trim();
-            
-            if (!filename) {
-                showNotification('檔案名稱不能為空', 'error');
+                google.script.run
+                    .withSuccessHandler((res) => {
+                        if (res && res.success) {
+                            const now = new Date().toLocaleString('zh-TW');
+                            const lmEl = document.getElementById('lastModifiedText'); if (lmEl) lmEl.textContent = now;
+                            const blEl = document.getElementById('bottomLeftModified'); if (blEl) blEl.textContent = now;
+                            showNotification(res.message || `已儲存：${filename}`, 'success');
+                        } else {
+                            showNotification((res && res.message) ? res.message : '儲存失敗', 'error');
+                        }
+                    })
+                    .withFailureHandler((err) => {
+                        console.error('saveNotebook error', err);
+                        showNotification('儲存失敗（後端錯誤）', 'error');
+                    })
+                    .saveNotebook(content);
+
                 return;
             }
 
-            document.getElementById('filename').value = filename;
-
-            // 保存到本地存儲
+            // 非 GAS 環境：直接以預設檔名下載（不顯示提示）
             saveToLocalStorage();
             hasUnsavedChanges = false;
             updateStatusIndicator();
-            
-            closeSaveModal();
-            showNotification(`✅ 已保存：${filename}`, 'success');
-
-            // 嘗試將內容儲存為本機檔案：優先使用 File System Access API，否則用 Blob 下載
-            const content = document.getElementById('editor').value;
-            saveToFile(filename, content).catch(err => {
+            saveToFile(filename, content).then(() => {
+                const now = new Date().toLocaleString('zh-TW');
+                const lmEl = document.getElementById('lastModifiedText'); if (lmEl) lmEl.textContent = now;
+                const blEl = document.getElementById('bottomLeftModified'); if (blEl) blEl.textContent = now;
+                showNotification(`✅ 已下載：${filename}`, 'success');
+            }).catch(err => {
                 console.error('Save failed:', err);
                 showNotification('儲存失敗，請檢查瀏覽器權限', 'error');
             });
+        }
 
-            // 更新最後保存與修改時間（包含日期）
-            const now = new Date();
-            const nowTs = now.toLocaleString('zh-TW');
-            const lmEl = document.getElementById('lastModifiedText');
-            if (lmEl) lmEl.textContent = nowTs;
-            const blEl = document.getElementById('bottomLeftModified');
-            if (blEl) blEl.textContent = nowTs;
+        // ============ 自動儲存 ============
+        let __autoSaveIntervalId = null;
+        function startAutoSave(intervalMs = 15000) {
+            if (__autoSaveIntervalId) return;
+            __autoSaveIntervalId = setInterval(() => {
+                autoSave();
+            }, intervalMs);
+        }
+
+        function autoSave() {
+            if (!hasUnsavedChanges) return;
+            if (loading) return;
+
+            const content = document.getElementById('editor').value;
+            // If running inside GAS, call backend save; otherwise fallback to download
+            if (window.google && google.script && google.script.run) {
+                setStatus('自動儲存中...', 'loading');
+                google.script.run
+                    .withSuccessHandler((res) => {
+                        if (res && res.success) {
+                            hasUnsavedChanges = false;
+                            const now = new Date().toLocaleString('zh-TW');
+                            const lmEl = document.getElementById('lastModifiedText'); if (lmEl) lmEl.textContent = now;
+                            const blEl = document.getElementById('bottomLeftModified'); if (blEl) blEl.textContent = now;
+                            setStatus('已就緒', 'saved');
+                            showNotification('自動儲存成功', 'success');
+                        } else {
+                            setStatus('儲存失敗', 'error');
+                            showNotification((res && res.message) ? res.message : '自動儲存失敗', 'error');
+                        }
+                    })
+                    .withFailureHandler((err) => {
+                        console.error('autoSave error', err);
+                        setStatus('儲存失敗', 'error');
+                        showNotification('自動儲存失敗（後端錯誤）', 'error');
+                    })
+                    .saveNotebook(content);
+            } else {
+                // 非 GAS 環境：不頻繁觸發下載，自動儲存只更新 localStorage
+                saveToLocalStorage();
+                hasUnsavedChanges = false;
+                const now = new Date().toLocaleString('zh-TW');
+                const lmEl = document.getElementById('lastModifiedText'); if (lmEl) lmEl.textContent = now;
+                const blEl = document.getElementById('bottomLeftModified'); if (blEl) blEl.textContent = now;
+                setStatus('已就緒', 'saved');
+                showNotification('本機已自動備份', 'success');
+            }
         }
 
         function handleOpen() {
