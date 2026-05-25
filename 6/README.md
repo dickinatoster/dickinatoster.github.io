@@ -1,203 +1,100 @@
-# ☁️ 雲端記事本 - Google Drive 集成版
+# ☁️ 雲端記事本 - 正式服務版
 
-## 📋 項目概述
+## 📋 方案概述
 
-此項目提供一個功能完整的雲端記事本應用，支援：
-- 🔐 Google Drive 集成
-- 💾 自動本地備份
-- ⌨️ 快捷鍵快速儲存（Ctrl+S）
-- 📝 即時字數計算
-- 🔄 多檔案管理
-- 📱 響應式設計，支援各種設備
+此版本以 Google Drive API + OAuth 2.0 為核心，適合正式服務與長期維護。前端不直接依賴 GAS，而是透過使用者登入 Google 後取得授權，直接讀寫指定的 Google Drive 資料夾。
 
----
+### 核心特性
 
-## 🚀 快速開始
-
-### 第 1 步：準備 Google Cloud 專案
-
-1. **建立 Google Cloud 專案**
-   - 訪問 [Google Cloud Console](https://console.cloud.google.com/)
-   - 點擊專案下拉選單
-   - 點擊 "新增專案"
-   - 輸入專案名稱（例如：CloudNotepad）
-   - 點擊 "建立"
-
-2. **啟用必要的 API**
-   - 在 Cloud Console 中，搜尋並啟用以下 API：
-     - Google Drive API
-     - Google Apps Script API
-
-3. **建立 OAuth 2.0 客戶端**
-   - 進入「憑證」
-   - 點擊「建立憑證」→ 「OAuth 2.0 客戶端 ID」
-   - 選擇應用類型：「網頁應用程式」
-   - 新增授權重定向 URI：你的網站 URL + `/6/`
-   - 記下 Client ID 和 Client Secret
+- 🔐 使用 OAuth 2.0 做登入與授權
+- 📁 直接存取 Google Drive 資料夾
+- 🧾 以使用者權限為基礎的讀寫控制
+- 💾 可搭配本地暫存與雲端同步
+- 🛡️ 適合正式產品的權限與審計需求
 
 ---
 
-### 第 2 步：建立 Google Apps Script 專案
+## 🧭 運作邏輯
 
-1. **建立新的 Apps Script 專案**
-   - 訪問 [Google Apps Script](https://script.google.com/)
-   - 點擊 "新增專案"
-   - 命名為 "CloudNotepad"
-
-2. **複製後端代碼**
-   - 打開 `script-template.gs` 文件
-   - 複製全部代碼
-   - 粘貼到 Google Apps Script 編輯器
-   - 按 Ctrl+S 保存
-
-3. **部署為 Web App**
-   - 點擊「部署」按鈕
-   - 選擇「新增部署」
-   - 類型選擇：Web App
-   - 執行身分：選擇您的帳戶
-   - 允許誰存取：「任何人」
-   - 點擊「部署」
-   - **記下部署 ID** (形式為 AKfycby...)
-
-4. **獲得 Web App URL**
-   ```
-   https://script.google.com/macros/d/{YOUR_DEPLOYMENT_ID}/userweb
-   ```
+1. 使用者在網站點擊「登入 Google」
+2. Google 驗證後回傳授權權杖
+3. 前端或後端使用 access token 呼叫 Google Drive API
+4. 系統讀取或更新指定資料夾中的檔案
+5. 必要時透過 refresh token 維持登入狀態
 
 ---
 
-### 第 3 步：配置前端代碼
+## 🚀 建置步驟
 
-1. **打開 index.html**
-   
-2. **更新配置**
-   在 JavaScript 配置部分找到並替換：
-   
-   ```javascript
-   // 第 37-39 行
-   const GAS_SCRIPT_URL = 'https://script.google.com/macros/d/{YOUR_DEPLOYMENT_ID}/userweb';
-   const CLIENT_ID = '{YOUR_CLIENT_ID}.apps.googleusercontent.com';
-   const API_KEY = '{YOUR_API_KEY}';
-   ```
+### 第 1 步：建立 Google Cloud 專案
 
-   替換為：
-   - `{YOUR_DEPLOYMENT_ID}` → 部署 ID
-   - `{YOUR_CLIENT_ID}` → OAuth Client ID
-   - `{YOUR_API_KEY}` → Google Drive API Key
+1. 前往 [Google Cloud Console](https://console.cloud.google.com/)
+2. 新增一個專案，例如 CloudNotepad
+3. 啟用 Google Drive API
+4. 設定 OAuth 同意畫面
 
-3. **保存文件**
+### 第 2 步：建立 OAuth 2.0 憑證
 
----
+1. 進入「憑證」頁面
+2. 建立 OAuth 2.0 用戶端 ID
+3. 應用類型選擇「網頁應用程式」
+4. 新增授權重新導向 URI
+5. 記下 Client ID 與 Client Secret
 
-### 第 4 步：本地測試
+### 第 3 步：整合前端與 API
 
-1. **打開瀏覽器**
-   - 導航到 `file:///C:/Users/Ptivs/Documents/GitHub/dickinatoster.github.io/6/index.html`
-   - 或使用本地 Web 服務器
-
-2. **測試功能**
-   - ✅ 點擊「登入 Google」
-   - ✅ 輸入筆記內容
-   - ✅ 按 Ctrl+S 或點擊儲存按鈕
-   - ✅ 刷新頁面，確認本地備份仍存在
+1. 在網站加入 Google 登入流程
+2. 取得使用者授權後呼叫 Drive API
+3. 依需求實作資料夾讀取、建立、更新與刪除
+4. 將關鍵設定改成環境變數或安全設定
 
 ---
 
-## 🎯 功能詳解
+## 🧩 建議架構
 
-### 💾 儲存機制
-
-| 儲存方式 | 說明 | 用途 |
-|---------|------|------|
-| **本地存儲** | 瀏覽器 LocalStorage | 即時草稿，瀏覽器關閉後保留 |
-| **Google Drive** | 透過 Apps Script | 永久備份，多設備同步 |
-
-### ⌨️ 快捷鍵
-
-| 快捷鍵 | 功能 |
-|--------|------|
-| **Ctrl+S** / **Cmd+S** | 快速儲存到 Google Drive |
-| **Ctrl+L** | 載入檔案（計劃中） |
-
-### 📊 界面組件
-
-- **狀態指示器**：顯示連接狀態
-- **字數計算器**：即時顯示字數
-- **最後儲存時間**：追蹤儲存歷史
-- **自動保存提示**：本地存儲時間戳
+| 元件 | 職責 |
+|------|------|
+| 前端網站 | 提供登入、瀏覽與編輯介面 |
+| OAuth 2.0 | 管理使用者授權與 token |
+| Google Drive API | 實際讀寫雲端資料夾 |
+| 後端服務 | 保護敏感設定、處理 token 更新與商業邏輯 |
 
 ---
 
-## 🔧 進階配置
+## 📌 實作重點
 
-### 自訂資料夾名稱
-
-編輯 `script-template.gs` 第 7 行：
-```javascript
-const FOLDER_NAME = "我的雲端記事本";  // 自訂資料夾名稱
-```
-
-### 支援多種檔案類型
-
-修改 `listUserFiles()` 函數以支援其他格式：
-```javascript
-// 支援 .txt 和 .md
-const files = folder.getFilesByType(MimeType.PLAIN_TEXT);
-// 或
-const files = DriveApp.getFiles();
-```
-
-### 增加檔案版本控制
-
-可在 Apps Script 中啟用版本歷史：
-```javascript
-// 在 saveFile() 中添加
-file.setContent(content);
-DriveApp.getFileById(fileId).makeCopy(`${filename}_backup_${timestamp}`);
-```
+- 若要做正式服務，建議把 token 交換與 refresh token 管理放在後端
+- 前端只保留登入按鈕、檔案清單與編輯介面
+- 讀寫 Drive 時要限制在指定資料夾或指定 app 資料範圍內
+- 上線前要確認 Google OAuth 驗證狀態與使用者同意畫面設定
 
 ---
 
-## 🐛 故障排除
+## 🐛 常見問題
 
-### 問題 1：登入不成功
-**解決方案：**
-- 確認 Client ID 和 API Key 正確
-- 檢查 OAuth 重定向 URI 配置
-- 清除瀏覽器 Cookie 和快取
+### 登入失敗
 
-### 問題 2：無法儲存到 Google Drive
-**解決方案：**
-- 確認部署 ID 正確
-- 檢查 Apps Script 執行身分
-- 確認 Google Drive API 已啟用
+- 檢查 Client ID 是否正確
+- 確認重新導向 URI 完全一致
+- 確認 OAuth 同意畫面已完成必要設定
 
-### 問題 3：頁面加載緩慢
-**解決方案：**
-- 檢查網路連接
-- 使用瀏覽器開發者工具檢查控制台
-- 檢查 Apps Script 配額使用情況
+### 無法讀寫 Drive
 
-### 問題 4：本地存儲數據丟失
-**解決方案：**
-- 檢查瀏覽器 LocalStorage 是否啟用
-- 確認沒有使用隱私瀏覽模式
-- 檢查瀏覽器存儲配額
+- 確認已啟用 Google Drive API
+- 確認授權 scope 足夠
+- 檢查 token 是否過期或被撤銷
+
+### 權限不完整
+
+- 檢查應用程式請求的 scope 是否過大或過小
+- 確認資料夾分享權限與使用者帳號一致
+- 若是正式服務，建議改由後端集中控管敏感操作
 
 ---
 
-## 📝 使用提示
+## ✅ 結論
 
-### ✨ 最佳實踐
-
-1. **定期備份**
-   - 使用 Ctrl+S 定期儲存
-   - 系統自動備份到本地
-
-2. **檔案命名**
-   - 避免特殊字符
-   - 使用清晰的描述性名稱
-   - 例如：`2024-5月計劃`、`工作日誌`
+如果目標是正式服務、長期維護與完整權限控管，這個資料夾應採用 Google Drive API + OAuth 2.0，而不是以 GAS Web App 作為主要架構。
 
 3. **隱私安全**
    - 在公共電腦上使用後點擊登出
@@ -217,42 +114,17 @@ DriveApp.getFileById(fileId).makeCopy(`${filename}_backup_${timestamp}`);
 
 ## 📚 API 文檔
 
-### GET 請求
+正式服務版本不再透過 GAS Web App 暴露自訂 API，而是直接以 Google Drive API 搭配 OAuth 2.0 存取資料。
 
-**列出檔案**
-```
-GET {GAS_SCRIPT_URL}?action=listFiles
-```
+建議依需求切分以下操作：
 
-**獲取檔案內容**
-```
-GET {GAS_SCRIPT_URL}?action=getFile&fileId={FILE_ID}
-```
+- 讀取檔案清單：使用 Drive API 查詢指定資料夾中的檔案
+- 讀取檔案內容：根據 fileId 取得檔案資料
+- 建立檔案：建立新檔並指定目標資料夾
+- 更新檔案：以檔案 ID 更新內容
+- 刪除檔案：依權限刪除或移除檔案
 
-**獲取用戶信息**
-```
-GET {GAS_SCRIPT_URL}?action=getUserInfo
-```
-
-### POST 請求
-
-**儲存檔案**
-```
-POST {GAS_SCRIPT_URL}?action=saveFile
-Body: {"filename": "筆記名稱", "content": "筆記內容"}
-```
-
-**建立檔案**
-```
-POST {GAS_SCRIPT_URL}?action=createFile
-Body: {"filename": "新檔案名稱"}
-```
-
-**刪除檔案**
-```
-POST {GAS_SCRIPT_URL}?action=deleteFile
-Body: {"fileId": "{FILE_ID}"}
-```
+實作時應將 token 交換、refresh token 管理與敏感設定保留在後端，前端只負責登入與檔案操作流程。
 
 ---
 
@@ -261,7 +133,7 @@ Body: {"fileId": "{FILE_ID}"}
 ```
 6/
 ├── index.html              # 前端應用
-├── script-template.gs      # Google Apps Script 後端
+├── script-template.gs      # Drive API / OAuth 串接範例
 └── README.md              # 此文件
 ```
 
@@ -302,9 +174,9 @@ Body: {"fileId": "{FILE_ID}"}
 
 有問題或建議？
 
-1. 檢查 [Google Apps Script 文檔](https://developers.google.com/apps-script)
-2. 查看 [Google Drive API 文檔](https://developers.google.com/drive)
-3. 在 Google Apps Script 編輯器中運行測試函數
+1. 查看 [Google Drive API 文檔](https://developers.google.com/drive)
+2. 查看 [Google OAuth 2.0 文檔](https://developers.google.com/identity/protocols/oauth2)
+3. 檢查 Google Cloud Console 的 OAuth 設定與授權畫面
 
 ---
 
