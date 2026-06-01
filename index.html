@@ -60,36 +60,29 @@
       z-index: 1;
     }
 
-    /* animated clouds */
-    .sky-clouds {
+    /* SVG-based animated clouds */
+    .svg-sky {
       position: fixed;
       inset: 0;
+      width: 100%;
+      height: 100%;
       pointer-events: none;
       z-index: 0;
       overflow: visible;
     }
 
-    .cloud {
-      position: absolute;
-      border-radius: 50%;
-      filter: blur(14px);
-      opacity: 0.98;
-      background: radial-gradient(circle at 30% 30%, rgba(255,255,255,1) 0%, rgba(255,255,255,0.92) 36%, rgba(255,255,255,0.82) 56%, transparent 72%);
-      transform: translateZ(0);
-      will-change: transform;
-    }
+    .svg-sky .cloud { opacity: 0.98; will-change: transform; transform-box: fill-box; transform-origin: center; }
+    /* single-direction left->right drift using vw for full-screen travel */
+    .svg-sky .c1 { animation: drift-lr 80s linear infinite; animation-delay: -10s; }
+    .svg-sky .c2 { animation: drift-lr 95s linear infinite; animation-delay: -24s; }
+    .svg-sky .c3 { animation: drift-lr 110s linear infinite; animation-delay: -36s; }
+    .svg-sky .c4 { animation: drift-lr 70s linear infinite; animation-delay: -18s; }
+    .svg-sky .c5 { animation: drift-lr 88s linear infinite; animation-delay: -8s; }
+    .svg-sky .c6 { animation: drift-lr 64s linear infinite; animation-delay: -4s; opacity: 0.92; }
 
-    .cloud.c1 { width: 780px; height: 180px; left: 6%; top: 12%; animation: drift 42s ease-in-out infinite; }
-    .cloud.c2 { width: 520px; height: 140px; left: 24%; top: 22%; animation: drift 50s ease-in-out infinite; animation-delay: -6s; }
-    .cloud.c3 { width: 860px; height: 220px; left: 40%; top: 14%; animation: drift 56s ease-in-out infinite; animation-delay: -12s; }
-    .cloud.c4 { width: 320px; height: 100px; left: 62%; top: 28%; animation: drift 44s ease-in-out infinite; animation-delay: -20s; }
-    .cloud.c5 { width: 440px; height: 130px; left: 84%; top: 30%; animation: drift 48s ease-in-out infinite; animation-delay: -8s; }
-    .cloud.c6 { width: 220px; height: 80px; left: 16%; top: 42%; animation: drift 36s ease-in-out infinite; animation-delay: -4s; filter: blur(12px); opacity: 0.92; }
-
-    @keyframes drift {
-      0% { transform: translateX(0) translateY(0); }
-      50% { transform: translateX(-48px) translateY(8px) scale(1.01); }
-      100% { transform: translateX(0) translateY(0); }
+    @keyframes drift-lr {
+      0% { transform: translateX(-40vw); }
+      100% { transform: translateX(130vw); }
     }
 
     main {
@@ -277,14 +270,60 @@
 </head>
 <body>
   <div class="grain" aria-hidden="true"></div>
-  <div class="sky-clouds" aria-hidden="true">
-    <span class="cloud c1"></span>
-    <span class="cloud c2"></span>
-    <span class="cloud c3"></span>
-    <span class="cloud c4"></span>
-    <span class="cloud c5"></span>
-    <span class="cloud c6"></span>
-  </div>
+  <svg class="svg-sky" aria-hidden="true" viewBox="0 0 1200 800" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <filter id="blur" x="-50%" y="-50%" width="200%" height="200%">
+        <feGaussianBlur stdDeviation="14" />
+      </filter>
+      <linearGradient id="cloudFill" x1="0" x2="0" y1="0" y2="1">
+        <stop offset="0%" stop-color="#ffffff" stop-opacity="1" />
+        <stop offset="70%" stop-color="#ffffff" stop-opacity="0.88" />
+        <stop offset="100%" stop-color="#ffffff" stop-opacity="0.82" />
+      </linearGradient>
+    </defs>
+
+    <!-- cloud 1 (left) -->
+    <g class="cloud c1" transform="translate(90,80)" filter="url(#blur)">
+      <ellipse cx="0" cy="40" rx="260" ry="60" fill="url(#cloudFill)" />
+      <ellipse cx="180" cy="20" rx="200" ry="50" fill="url(#cloudFill)" />
+      <ellipse cx="-140" cy="20" rx="180" ry="45" fill="url(#cloudFill)" />
+    </g>
+
+    <!-- cloud 2 -->
+    <g class="cloud c2" transform="translate(300,150)" filter="url(#blur)">
+      <ellipse cx="0" cy="30" rx="180" ry="50" fill="url(#cloudFill)" />
+      <ellipse cx="120" cy="10" rx="140" ry="40" fill="url(#cloudFill)" />
+      <ellipse cx="-100" cy="10" rx="120" ry="38" fill="url(#cloudFill)" />
+    </g>
+
+    <!-- cloud 3 (center) -->
+    <g class="cloud c3" transform="translate(520,72)" filter="url(#blur)">
+      <ellipse cx="0" cy="45" rx="300" ry="70" fill="url(#cloudFill)" />
+      <ellipse cx="220" cy="25" rx="220" ry="60" fill="url(#cloudFill)" />
+      <ellipse cx="-180" cy="25" rx="200" ry="60" fill="url(#cloudFill)" />
+    </g>
+
+    <!-- cloud 4 -->
+    <g class="cloud c4" transform="translate(760,200)" filter="url(#blur)">
+      <ellipse cx="0" cy="30" rx="120" ry="36" fill="url(#cloudFill)" />
+      <ellipse cx="90" cy="12" rx="96" ry="30" fill="url(#cloudFill)" />
+      <ellipse cx="-80" cy="12" rx="88" ry="28" fill="url(#cloudFill)" />
+    </g>
+
+    <!-- cloud 5 (right) -->
+    <g class="cloud c5" transform="translate(980,180)" filter="url(#blur)">
+      <ellipse cx="0" cy="34" rx="160" ry="44" fill="url(#cloudFill)" />
+      <ellipse cx="120" cy="14" rx="120" ry="36" fill="url(#cloudFill)" />
+      <ellipse cx="-100" cy="14" rx="110" ry="34" fill="url(#cloudFill)" />
+    </g>
+
+    <!-- cloud 6 (lower puff) -->
+    <g class="cloud c6" transform="translate(200,300)" filter="url(#blur)">
+      <ellipse cx="0" cy="20" rx="110" ry="32" fill="url(#cloudFill)" />
+      <ellipse cx="70" cy="8" rx="80" ry="26" fill="url(#cloudFill)" />
+      <ellipse cx="-60" cy="8" rx="70" ry="24" fill="url(#cloudFill)" />
+    </g>
+  </svg>
   <main>
     <section class="hero" aria-labelledby="intro-title">
       <span class="tag">PORTFOLIO HOME</span>
