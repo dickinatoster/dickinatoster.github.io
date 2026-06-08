@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>英文單字測驗</title>
+  <style>
+    :root {
+      --bg-left: #edf7ff;
+      --bg-right: #d7ecff;
+      --surface: rgba(255, 255, 255, 0.96);
+      --surface-soft: rgba(255, 255, 255, 0.8);
+      --border: rgba(64, 108, 148, 0.12);
+      --text: #203349;
+      --muted: #6a7d91;
+      --accent: #5bb6e6;
+      --accent-dark: #2f8fcb;
+      --warn: #f0b51f;
+      --correct: #2eae71;
+      --incorrect: #e45a5a;
+      --shadow: 0 26px 80px rgba(22, 44, 62, 0.15);
+      --radius-xl: 30px;
+      --radius-lg: 22px;
+      --radius-md: 18px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html, body {
+      min-height: 100%;
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', 'Microsoft JhengHei', 'Noto Sans TC', sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 18% 16%, rgba(245, 251, 255, 0.98), transparent 34%),
+        radial-gradient(circle at 86% 18%, rgba(211, 237, 255, 0.96), transparent 28%),
+        linear-gradient(135deg, var(--bg-left), var(--bg-right));
+      padding: 16px;
+    }
+
+    .app {
+      width: min(840px, 100%);
+      min-height: calc(100vh - 32px);
+      margin: 0 auto;
+      background: var(--surface);
+      border-radius: 28px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      border: 1px solid rgba(255, 255, 255, 0.72);
+    }
+
+    .hero {
+      padding: 22px 26px 30px;
+      background: linear-gradient(135deg, #dff2ff 0%, #aad8f5 48%, #74bde7 100%);
+      color: #16324a;
+      position: relative;
+    }
+
+    .hero::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, rgba(255,255,255,0.08), transparent 54%);
+      pointer-events: none;
+    }
+
+    .hero h1 {
+      margin: 0;
+      font-size: clamp(28px, 4vw, 40px);
+      line-height: 1.15;
+      letter-spacing: 0.02em;
+      font-weight: 900;
+    }
+
+    .hero p {
+      margin: 10px 0 0;
+      font-size: 14px;
+      line-height: 1.7;
+      font-weight: 600;
+      max-width: 720px;
+    }
+
+    .designer-credit {
+      margin-top: 10px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 7px 12px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.28);
+      border: 1px solid rgba(255, 255, 255, 0.42);
+      color: #1f4f73;
+      font-size: 13px;
+      font-weight: 800;
+      letter-spacing: 0.02em;
+      backdrop-filter: blur(10px);
+    }
+
+    .board {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+      padding: 16px 16px 0;
+    }
+
+    .stat {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 14px 16px 15px;
+      box-shadow: 0 8px 24px rgba(34, 57, 78, 0.04);
+      min-height: 82px;
+    }
+
+    .stat .label {
+      font-size: 13px;
+      color: var(--muted);
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .stat .value {
+      font-size: 26px;
+      line-height: 1;
+      font-weight: 900;
+      color: var(--text);
+    }
+
+    .workspace {
+      margin: 16px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 26px;
+      box-shadow: 0 12px 30px rgba(34, 57, 78, 0.05);
+      padding: 18px 18px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      flex: 1;
+      min-height: 0;
+    }
+
+    .workspace-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .prompt {
+      color: var(--muted);
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .source-pill {
+      padding: 10px 16px;
+      border-radius: 999px;
+      background: rgba(91, 182, 230, 0.14);
+      color: #2f7fb2;
+      font-weight: 800;
+      font-size: 14px;
+    }
+
+    .question {
+      font-size: clamp(42px, 7vw, 62px);
+      line-height: 1.05;
+      font-weight: 900;
+      letter-spacing: 0.01em;
+      margin: 0;
+      color: #22364e;
+      word-break: break-word;
+    }
+
+    .options {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .option {
+      appearance: none;
+      border: 1px solid #e3eaf1;
+      background: #fff;
+      color: #304356;
+      border-radius: 16px;
+      min-height: 72px;
+      padding: 14px 16px;
+      text-align: left;
+      font-size: 17px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform 160ms ease, box-shadow 160ms ease, border-color 160ms ease, background 160ms ease;
+    }
+
+    .option:hover:not(:disabled) {
+      transform: translateY(-1px);
+      border-color: rgba(91, 182, 230, 0.52);
+      box-shadow: 0 10px 24px rgba(91, 182, 230, 0.1);
+    }
+
+    .option:disabled {
+      cursor: default;
+    }
+
+    .option.correct {
+      background: rgba(46, 174, 113, 0.12);
+      border-color: rgba(46, 174, 113, 0.45);
+      color: #136441;
+    }
+
+    .option.incorrect {
+      background: rgba(228, 90, 90, 0.1);
+      border-color: rgba(228, 90, 90, 0.35);
+      color: #a23333;
+    }
+
+    .option.muted {
+      opacity: 0.82;
+    }
+
+    .feedback {
+      min-height: 24px;
+      color: var(--muted);
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .feedback.good {
+      color: var(--correct);
+    }
+
+    .feedback.bad {
+      color: var(--incorrect);
+    }
+
+    .footer {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-top: auto;
+    }
+
+    .btn {
+      appearance: none;
+      border: none;
+      border-radius: 16px;
+      padding: 14px 20px;
+      font-size: 16px;
+      font-weight: 800;
+      cursor: pointer;
+      transition: transform 160ms ease, box-shadow 160ms ease, background 160ms ease, opacity 160ms ease;
+    }
+
+    .btn:hover:not(:disabled) {
+      transform: translateY(-1px);
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #69b9ea, #4a9fd7);
+      color: #fff;
+      box-shadow: 0 14px 26px rgba(74, 159, 215, 0.22);
+    }
+
+    .btn-primary:disabled {
+      opacity: 0.75;
+      cursor: default;
+      transform: none;
+    }
+
+    .btn-secondary {
+      background: #eef5f6;
+      color: #1b5f68;
+    }
+
+    .result-card {
+      display: none;
+      padding: 10px 0 4px;
+      color: var(--text);
+    }
+
+    .result-card.show {
+      display: block;
+    }
+
+    .result-card h2 {
+      margin: 0 0 8px;
+      font-size: 28px;
+      font-weight: 900;
+    }
+
+    .result-card p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.7;
+      font-weight: 600;
+    }
+
+    .loading {
+      display: grid;
+      place-items: center;
+      min-height: 220px;
+      color: var(--muted);
+      font-weight: 700;
+      letter-spacing: 0.03em;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    @media (max-width: 700px) {
+      body {
+        padding: 10px;
+      }
+
+      .app {
+        min-height: calc(100vh - 20px);
+      }
+
+      .hero,
+      .workspace {
+        border-radius: 22px;
+      }
+
+      .board,
+      .options {
+        grid-template-columns: 1fr;
+      }
+
+      .question {
+        font-size: clamp(32px, 12vw, 46px);
+      }
+
+      .option {
+        min-height: 64px;
+        font-size: 16px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <section class="hero">
+      <h1>英文單字測驗</h1>
+      <p>題目會從 Google 試算表讀取英文單字與中文意思，系統會自動出題，答完即可立刻看到成績。總分固定 100 分，每題 10 分。</p>
+      <div class="designer-credit">設計者：王怡文</div>
+    </section>
+
+    <section class="board" aria-label="測驗資訊">
+      <div class="stat">
+        <div class="label">目前題號</div>
+        <div class="value" id="currentNumber">- / -</div>
+      </div>
+      <div class="stat">
+        <div class="label">目前分數</div>
+        <div class="value" id="currentScore">0</div>
+      </div>
+      <div class="stat">
+        <div class="label">單字來源</div>
+        <div class="value" id="sourceLabel" style="font-size: 18px; line-height: 1.25;">讀取中</div>
+      </div>
+    </section>
+
+    <section class="workspace">
+      <div class="loading" id="loadingState">載入題庫中...</div>
+
+      <div id="quizState" class="hidden">
+        <div class="workspace-head">
+          <div class="prompt">請選出這個英文單字的正確中文意思</div>
+          <div class="source-pill" id="sourcePill">工作表：工作表1</div>
+        </div>
+
+        <h2 class="question" id="questionWord">-</h2>
+
+        <div class="options" id="optionsGrid"></div>
+
+        <div class="feedback" id="feedbackText"></div>
+
+        <div class="footer">
+          <button class="btn btn-secondary" id="resetButton" type="button">重新抽題</button>
+        </div>
+      </div>
+
+      <div class="result-card" id="resultState">
+        <h2 id="resultTitle">測驗完成</h2>
+        <p id="resultSummary"></p>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const state = {
+      questions: [],
+      currentIndex: 0,
+      score: 0,
+      answers: [],
+      locked: false,
+      finished: false,
+      sourceLabel: '內建題庫',
+      totalScore: 100,
+      pointsPerQuestion: 10,
+      autoAdvanceTimer: null
+    };
+
+    const loadingState = document.getElementById('loadingState');
+    const quizState = document.getElementById('quizState');
+    const resultState = document.getElementById('resultState');
+    const questionWord = document.getElementById('questionWord');
+    const optionsGrid = document.getElementById('optionsGrid');
+    const currentNumber = document.getElementById('currentNumber');
+    const currentScore = document.getElementById('currentScore');
+    const sourceLabel = document.getElementById('sourceLabel');
+    const sourcePill = document.getElementById('sourcePill');
+    const feedbackText = document.getElementById('feedbackText');
+    const resetButton = document.getElementById('resetButton');
+    const resultTitle = document.getElementById('resultTitle');
+    const resultSummary = document.getElementById('resultSummary');
+
+    resetButton.addEventListener('click', () => {
+      startQuiz();
+    });
+
+    function startQuiz() {
+      clearTimeout(state.autoAdvanceTimer);
+      state.questions = [];
+      state.currentIndex = 0;
+      state.score = 0;
+      state.answers = [];
+      state.locked = false;
+      state.finished = false;
+      feedbackText.textContent = '';
+      feedbackText.className = 'feedback';
+      resultState.classList.remove('show');
+      quizState.classList.add('hidden');
+      loadingState.classList.remove('hidden');
+      loadingState.textContent = '載入題庫中...';
+
+      google.script.run
+        .withSuccessHandler((payload) => {
+          if (!payload || !payload.success) {
+            showError('題庫載入失敗，請檢查 Apps Script 與試算表設定。');
+            return;
+          }
+
+          state.questions = payload.questions || [];
+          state.totalScore = payload.totalScore || 100;
+          state.pointsPerQuestion = payload.pointsPerQuestion || 10;
+          state.sourceLabel = payload.sourceLabel || '內建題庫';
+          sourceLabel.textContent = state.sourceLabel;
+          sourcePill.textContent = state.sourceLabel;
+          loadingState.classList.add('hidden');
+
+          if (!state.questions.length) {
+            showError('題庫沒有足夠的題目。請在試算表加入至少 10 題。');
+            return;
+          }
+
+          quizState.classList.remove('hidden');
+          renderQuestion();
+        })
+        .withFailureHandler((error) => {
+          showError((error && error.message) ? error.message : '無法連線到 Apps Script。');
+        })
+        .getQuizPayload();
+    }
+
+    function showError(message) {
+      loadingState.classList.remove('hidden');
+      quizState.classList.add('hidden');
+      resultState.classList.remove('show');
+      loadingState.textContent = message;
+      sourceLabel.textContent = '錯誤';
+      sourcePill.textContent = '錯誤';
+    }
+
+    function renderQuestion() {
+      const question = state.questions[state.currentIndex];
+      if (!question) {
+        finishQuiz();
+        return;
+      }
+
+      clearTimeout(state.autoAdvanceTimer);
+      state.locked = false;
+      currentNumber.textContent = `${state.currentIndex + 1} / ${state.questions.length}`;
+      currentScore.textContent = String(state.score);
+      questionWord.textContent = question.word;
+      feedbackText.textContent = '';
+      feedbackText.className = 'feedback';
+      optionsGrid.innerHTML = '';
+
+      question.options.forEach((option, optionIndex) => {
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.className = 'option';
+        button.textContent = option;
+        button.addEventListener('click', () => selectAnswer(optionIndex, button));
+        optionsGrid.appendChild(button);
+      });
+    }
+
+    function selectAnswer(optionIndex, button) {
+      if (state.locked) {
+        return;
+      }
+
+      const question = state.questions[state.currentIndex];
+      const isCorrect = optionIndex === question.correctIndex;
+      state.locked = true;
+      state.answers[state.currentIndex] = optionIndex;
+
+      const buttons = Array.from(optionsGrid.querySelectorAll('.option'));
+      buttons.forEach((item, index) => {
+        item.disabled = true;
+        if (index === question.correctIndex) {
+          item.classList.add('correct');
+        } else if (index === optionIndex && !isCorrect) {
+          item.classList.add('incorrect');
+        } else {
+          item.classList.add('muted');
+        }
+      });
+
+      if (isCorrect) {
+        state.score += state.pointsPerQuestion;
+        currentScore.textContent = String(state.score);
+        feedbackText.textContent = '答對了，10 分入袋。';
+        feedbackText.className = 'feedback good';
+      } else {
+        feedbackText.textContent = `答錯了，正確答案是：${question.options[question.correctIndex]}。`;
+        feedbackText.className = 'feedback bad';
+      }
+
+      state.autoAdvanceTimer = setTimeout(() => {
+        state.currentIndex += 1;
+        if (state.currentIndex >= state.questions.length) {
+          finishQuiz();
+          return;
+        }
+        renderQuestion();
+      }, 850);
+    }
+
+    function finishQuiz() {
+      state.finished = true;
+      clearTimeout(state.autoAdvanceTimer);
+      quizState.classList.add('hidden');
+      resultState.classList.add('show');
+      currentNumber.textContent = `${state.questions.length} / ${state.questions.length}`;
+      currentScore.textContent = String(state.score);
+      resultTitle.textContent = '測驗完成';
+      resultSummary.textContent = `你的分數是 ${state.score} / ${state.totalScore}。按「重新抽題」可以再做一份新的 10 題測驗。`;
+    }
+
+    startQuiz();
+  </script>
+</body>
+</html>
