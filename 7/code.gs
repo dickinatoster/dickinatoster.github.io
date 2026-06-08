@@ -5,6 +5,7 @@ const QUIZ_SHEET_NAME = '';
 function doGet() {
   const template = HtmlService.createTemplateFromFile('index');
   template.quizDataJson = JSON.stringify(getQuizData());
+  template.quizSourceCount = getQuizSourceCount();
 
   return template.evaluate()
     .setTitle(APP_TITLE)
@@ -285,4 +286,23 @@ function getFallbackQuizData() {
   ];
 
   return baseQuiz;
+}
+
+function getQuizSourceCount() {
+  try {
+    var spreadsheet = SpreadsheetApp.openById(QUIZ_SPREADSHEET_ID);
+    var sheet = getQuizSheet(spreadsheet);
+    if (sheet) {
+      var rows = sheet.getDataRange().getNumRows();
+      // 若有表頭，實際題數為 rows - 1
+      var count = Math.max(0, rows - 1);
+      // 若來源題數非常大也不用展現超出 200，顯示來源上限 200
+      return Math.min(Math.max(count, 0), 200) || 200;
+    }
+  } catch (e) {
+    Logger.log('無法讀取試算表來源數量：' + e);
+  }
+
+  // 預設顯示 200 個單字來源
+  return 200;
 }

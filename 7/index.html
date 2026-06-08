@@ -478,16 +478,16 @@
 
       <div class="stats">
         <div class="stat">
-          <span class="label">總分</span>
-          <span class="value" id="totalScoreStat">100 分</span>
+          <span class="label">目前題號</span>
+          <span class="value" id="currentQuestionStat">1 / 10</span>
         </div>
         <div class="stat">
-          <span class="label">題數</span>
-          <span class="value" id="totalQuestions">10 題</span>
+          <span class="label">目前分數</span>
+          <span class="value" id="currentScoreStat">0</span>
         </div>
         <div class="stat">
-          <span class="label">每題配分</span>
-          <span class="value">10 分</span>
+          <span class="label">單字來源</span>
+          <span class="value" id="wordSourceStat">200 個單字</span>
         </div>
       </div>
     </section>
@@ -524,6 +524,7 @@
 
   <script>
     const quizData = <?!= quizDataJson ?>;
+    const quizSourceCount = <?!= quizSourceCount ?>;
     const totalScore = quizData.reduce((sum, item) => sum + (Number(item.points) || 10), 0);
     const state = {
       currentIndex: 0,
@@ -541,13 +542,15 @@
     const nextBtn = document.getElementById('nextBtn');
     const submitBtn = document.getElementById('submitBtn');
     const resultPanel = document.getElementById('resultPanel');
-    const totalQuestions = document.getElementById('totalQuestions');
+    const currentQuestionStat = document.getElementById('currentQuestionStat');
+    const currentScoreStat = document.getElementById('currentScoreStat');
+    const wordSourceStat = document.getElementById('wordSourceStat');
     const totalScoreInline = document.getElementById('totalScoreInline');
-    const totalScoreStat = document.getElementById('totalScoreStat');
 
-    totalQuestions.textContent = `${quizData.length} 題`;
+    currentQuestionStat.textContent = `1 / ${quizData.length}`;
+    currentScoreStat.textContent = `0`;
+    wordSourceStat.textContent = `${quizSourceCount} 個單字`;
     totalScoreInline.textContent = totalScore;
-    totalScoreStat.textContent = `${totalScore} 分`;
     progressText.textContent = `第 1 題 / ${quizData.length} 題`;
 
     function renderQuestion() {
@@ -557,6 +560,7 @@
       questionText.textContent = currentQuestion.question;
       questionTag.textContent = `題目 ${state.currentIndex + 1}`;
       progressText.textContent = `第 ${state.currentIndex + 1} 題 / ${quizData.length} 題`;
+      currentQuestionStat.textContent = `${state.currentIndex + 1} / ${quizData.length}`;
       progressBar.style.width = `${((state.currentIndex + 1) / quizData.length) * 100}%`;
       options.innerHTML = '';
 
@@ -612,8 +616,9 @@
         });
       });
 
+      const rounded = Number(score.toFixed(1));
       return {
-        score: Number(score.toFixed(1)),
+        score: rounded,
         correctCount,
         review
       };
@@ -645,6 +650,9 @@
           `).join('')}
         </div>
       `;
+
+      // 更新目前分數顯示
+      currentScoreStat.textContent = result.score;
 
       options.querySelectorAll('.option').forEach((button, optionIndex) => {
         button.disabled = true;
