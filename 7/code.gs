@@ -14,14 +14,45 @@ function doGet() {
 function getQuizData() {
   try {
     const quizData = readQuizDataFromSpreadsheet();
+    if (quizData.length >= 200) {
+      return normalizeQuizData(quizData.slice(0, 200));
+    }
     if (quizData.length > 0) {
-      return quizData;
+      return normalizeQuizData(padQuizDataTo200(quizData));
     }
   } catch (error) {
     Logger.log('讀取試算表題庫失敗：' + error);
   }
 
-  return getFallbackQuizData();
+  return normalizeQuizData(padQuizDataTo200(getFallbackQuizData()));
+}
+
+function normalizeQuizData(quizData) {
+  return quizData.map(function (item) {
+    return {
+      question: item.question,
+      options: item.options.slice(),
+      answer: item.answer,
+      points: 0.5
+    };
+  });
+}
+
+function padQuizDataTo200(quizData) {
+  const padded = quizData.slice();
+  const fallbackQuiz = getFallbackQuizData();
+
+  for (let index = padded.length; index < 200; index += 1) {
+    const fallbackItem = fallbackQuiz[index % fallbackQuiz.length];
+    padded.push({
+      question: fallbackItem.question + '（' + (index + 1) + '）',
+      options: fallbackItem.options.slice(),
+      answer: fallbackItem.answer,
+      points: 0.5
+    });
+  }
+
+  return padded;
 }
 
 function readQuizDataFromSpreadsheet() {
@@ -164,70 +195,72 @@ function parsePoints(value, optionCount) {
     return numeric;
   }
 
-  return 10;
+  return 0.5;
 }
 
 function getFallbackQuizData() {
-  return [
+  const baseQuiz = [
     {
       question: '在 Google Apps Script 中，哪一個函式通常用來提供網頁入口？',
       options: ['doGet()', 'main()', 'startApp()', 'renderPage()'],
       answer: 0,
-      points: 10
+      points: 0.5
     },
     {
       question: '如果要建立一個可直接在瀏覽器顯示的頁面，應該優先使用哪個服務？',
       options: ['HtmlService', 'DriveApp', 'SpreadsheetApp', 'MailApp'],
       answer: 0,
-      points: 10
+      points: 0.5
     },
     {
       question: '要讀取試算表資料，最常用的 GAS 類別是哪一個？',
       options: ['SpreadsheetApp', 'PropertiesService', 'LockService', 'CacheService'],
       answer: 0,
-      points: 10
+      points: 0.5
     },
     {
       question: '若想把資料寫入 Google 雲端硬碟，通常會使用哪個服務？',
       options: ['DriveApp', 'Browser', 'UrlFetchApp', 'Session'],
       answer: 0,
-      points: 10
+      points: 0.5
     },
     {
       question: '下列哪一個功能最適合記錄除錯訊息？',
       options: ['Logger.log()', 'alert()', 'console.table()', 'print()'],
       answer: 0,
-      points: 10
+      points: 0.5
     },
     {
       question: '要將網頁部署成 Web App，通常需要在什麼地方設定？',
       options: ['部署 / 新部署', '檔案 / 另存新檔', '編輯 / 偏好設定', '執行 / 測試模式'],
       answer: 0,
-      points: 10
+      points: 0.5
     },
     {
       question: '如果想儲存少量設定值，例如分數或使用者狀態，哪個服務最合適？',
       options: ['PropertiesService', 'MimeType', 'CalendarApp', 'DocumentApp'],
       answer: 0,
-      points: 10
+      points: 0.5
     },
     {
       question: '哪一個物件常用來獲取目前使用者的資訊或時區？',
       options: ['Session', 'FormApp', 'SlidesApp', 'LockService'],
       answer: 0,
-      points: 10
+      points: 0.5
     },
     {
       question: '在 HTML 頁面中，若要把 GAS 資料傳回前端，常見方式是什麼？',
       options: ['google.script.run', 'fetch() 直接讀 Apps Script 內部函式', 'window.drive.send()', 'script.callServer()'],
       answer: 0,
-      points: 10
+      points: 0.5
     },
     {
       question: '下列哪一個工具可用來格式化日期與時間？',
       options: ['Utilities.formatDate()', 'SpreadsheetApp.format()', 'DriveApp.date()', 'HtmlService.format()'],
       answer: 0,
-      points: 10
+      points: 0.5
     }
   ];
+
+  return baseQuiz;
 }
