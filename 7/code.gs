@@ -13,18 +13,40 @@ function doGet() {
 
 function getQuizData() {
   try {
-    const quizData = readQuizDataFromSpreadsheet();
-    if (quizData.length >= 200) {
-      return normalizeQuizData(quizData.slice(0, 200));
-    }
-    if (quizData.length > 0) {
-      return normalizeQuizData(padQuizDataTo200(quizData));
-    }
+    var quizData = readQuizDataFromSpreadsheet();
+    if (!quizData || !quizData.length) throw new Error('no data');
   } catch (error) {
-    Logger.log('讀取試算表題庫失敗：' + error);
+    Logger.log('讀取試算表題庫失敗或無資料，改用內建題庫：' + error);
+    var quizData = getFallbackQuizData();
   }
 
-  return normalizeQuizData(padQuizDataTo200(getFallbackQuizData()));
+  // 取前 10 題作為本次測驗，並將每題配分設為 10 分，總分 100
+  var finalQuiz = quizData.slice(0, 10).map(function (it) {
+    return {
+      question: it.question,
+      options: it.options.slice(),
+      answer: it.answer,
+      points: 10
+    };
+  });
+
+  // 若不足 10 題則補足（用 fallback 的題目）
+  if (finalQuiz.length < 10) {
+    var fallback = getFallbackQuizData();
+    var i = 0;
+    while (finalQuiz.length < 10) {
+      var src = fallback[i % fallback.length];
+      finalQuiz.push({
+        question: src.question + '（補充 ' + (i + 1) + '）',
+        options: src.options.slice(),
+        answer: src.answer,
+        points: 10
+      });
+      i += 1;
+    }
+  }
+
+  return finalQuiz;
 }
 
 function normalizeQuizData(quizData) {
