@@ -5,13 +5,27 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>作品集 — Dick in a Toaster</title>
   <style>
-    body{font-family:Arial,Helvetica,sans-serif;background:#f5f5f7;color:#111;margin:0;padding:40px}
-    .card{max-width:980px;margin:20px auto;padding:20px;background:#fff;border-radius:12px;box-shadow:0 6px 20px rgba(0,0,0,0.08)}
+    body{font-family:Arial,Helvetica,sans-serif;color:#111;margin:0;padding:40px;background:linear-gradient(180deg,#e6f6ff 0%,#d6f0ff 60%);background-attachment:fixed}
+    /* soft cloud effect using radial gradients */
+    body::before{content:"";position:fixed;inset:0;pointer-events:none;background-image:radial-gradient(circle at 10% 15%, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0) 20%),radial-gradient(circle at 85% 30%, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0) 18%),radial-gradient(circle at 50% 80%, rgba(255,255,255,0.92) 0%, rgba(255,255,255,0) 22%);opacity:0.9}
+    .card{max-width:980px;margin:20px auto;padding:26px;background:rgba(255,255,255,0.95);border-radius:14px;box-shadow:0 12px 30px rgba(31,111,166,0.06);border:1px solid rgba(31,111,166,0.06)}
     h1{margin:0 0 10px}
     .meta{color:#666;font-size:0.95rem}
     a.button{display:inline-block;margin-top:12px;padding:10px 14px;background:#4ea6d6;color:#fff;border-radius:8px;text-decoration:none}
     .grid{display:grid;grid-template-columns:1fr 320px;gap:20px}
     pre{background:#fafafa;padding:12px;border-radius:8px;overflow:auto}
+
+    /* project card styles */
+    .projects{margin-top:22px;display:flex;gap:20px;flex-wrap:wrap}
+    .project-card{display:block;width:320px;text-decoration:none;color:inherit}
+    .project-card .thumb{border-radius:12px;overflow:hidden;border:1px solid #eee;box-shadow:0 8px 18px rgba(0,0,0,0.06);background:#fff}
+    .project-card .thumb img{display:block;width:100%;height:auto;aspect-ratio:16/9;object-fit:cover}
+    .project-card h3{margin:10px 0 6px;font-size:1.05rem}
+    .project-card .desc{color:#666;font-size:0.95rem}
+    .project-card .cta{margin-top:8px}
+    .btn{display:inline-block;padding:8px 12px;border-radius:8px}
+    .btn.primary{background:#1f6fa6;color:#fff}
+    .btn.ghost{background:#fff;border:1px solid #ddd;color:#1f6fa6}
   </style>
 </head>
 <body>
@@ -42,6 +56,36 @@
             <div style="margin-top:8px;font-weight:700">5. ntfy 聊天應用</div>
             <div style="color:#666;font-size:0.95rem">單頁聊天 UI，整合 ntfy.sh 發送與 SSE 訂閱</div>
           </a>
+          <div style="flex-basis:100%;height:0"></div>
+          <a href="/7/index.html" target="_blank" style="display:block;width:320px;text-decoration:none;color:inherit;margin-top:8px;">
+            <div style="border-radius:12px;overflow:hidden;border:1px solid #eee;box-shadow:0 8px 18px rgba(0,0,0,0.06);background:linear-gradient(180deg,#eaf6ff,#ffffff);display:flex;align-items:center;justify-content:center;">
+              <div style="font-weight:900;color:#1f6fa6;font-size:20px;padding:28px 6px">7. 設計GAS程式</div>
+            </div>
+            <div style="margin-top:8px;font-weight:700">7. 設計GAS程式</div>
+            <div style="color:#666;font-size:0.95rem">設計者：王怡文。淡藍色介面的 GAS 選擇題測驗，總分 100 分，作答後立即顯示成績。</div>
+          </a>
+        </div>
+
+        <!-- 顯示為作品卡片區（包含第7項） -->
+        <div style="margin-top:22px; display:flex; gap:20px; flex-wrap:wrap;">
+          <a href="/5/index.html" target="_blank" style="display:block;width:320px;text-decoration:none;color:inherit;">
+            <div style="border-radius:12px;overflow:hidden;border:1px solid #eee;box-shadow:0 8px 18px rgba(0,0,0,0.06);background:#fff;">
+              <img src="assets/ntfy.svg" alt="ntfy 縮圖" style="width:100%;height:auto;display:block;aspect-ratio:16/9;object-fit:cover;" />
+            </div>
+            <div style="margin-top:8px;font-weight:700">5. ntfy 聊天應用</div>
+            <div style="color:#666;font-size:0.95rem">整合 ntfy.sh 的即時通訊範例，含發送腳本與 SSE 訂閱。</div>
+            <div style="margin-top:8px"><span style="display:inline-block;padding:8px 12px;background:#4ea6d6;color:#fff;border-radius:8px">打開範例</span></div>
+          </a>
+
+          <a href="/7/index.html" target="_blank" style="display:block;width:320px;text-decoration:none;color:inherit;">
+            <div style="border-radius:12px;overflow:hidden;border:1px solid #eee;box-shadow:0 8px 18px rgba(0,0,0,0.06);background:linear-gradient(180deg,#eaf6ff,#ffffff);">
+              <img src="assets/quiz.png" alt="quiz 縮圖" style="width:100%;height:auto;display:block;aspect-ratio:16/9;object-fit:cover;" />
+            </div>
+            <div style="margin-top:8px;font-weight:700">7. 設計GAS程式</div>
+            <div style="color:#666;font-size:0.95rem">設計者：王怡文。淡藍色介面的 GAS 選擇題測驗，總分 100 分，作答後立即顯示成績。</div>
+            <div style="margin-top:8px"><span style="display:inline-block;padding:8px 12px;background:#1f6fa6;color:#fff;border-radius:8px">開始測驗</span></div>
+          </a>
+        </div>
         </div>
 
         <h3>命令列發送示例</h3>

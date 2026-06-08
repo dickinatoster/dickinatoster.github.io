@@ -1,260 +1,233 @@
-const APP_TITLE = '英文單字測驗';
-const QUIZ_SIZE = 10;
-const POINTS_PER_QUESTION = 10;
-const TOTAL_SCORE = QUIZ_SIZE * POINTS_PER_QUESTION;
-const SPREADSHEET_ID = '1PHc9TZ2QkhUhTklXJlLPsqArv-SopLpdYZ0YCcj9HtQ';
-const SHEET_CANDIDATES = ['工作表1', '題庫', 'Quiz', 'Sheet1'];
+const APP_TITLE = '王怡文｜7. 設計GAS程式｜選擇題測驗';
+const QUIZ_SPREADSHEET_ID = '13UwVbuvfpiL9Tv5jh3bSl3h1omvewTmPuLW1VnvHiew';
+const QUIZ_SHEET_NAME = '';
 
 function doGet() {
-  return HtmlService.createHtmlOutputFromFile('index')
+  const template = HtmlService.createTemplateFromFile('index');
+  template.quizDataJson = JSON.stringify(getQuizData());
+
+  return template.evaluate()
     .setTitle(APP_TITLE)
     .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
 }
 
-function getQuizPayload() {
-  const bank = loadQuestionBank();
-  const questions = pickQuestions(bank, QUIZ_SIZE);
-
-  return {
-    success: true,
-    title: APP_TITLE,
-    totalScore: TOTAL_SCORE,
-    questionCount: questions.length,
-    pointsPerQuestion: POINTS_PER_QUESTION,
-    sourceLabel: bank.sourceLabel,
-    questions: questions
-  };
-}
-
-function gradeQuiz(request) {
-  const bank = loadQuestionBank();
-  const questions = pickQuestions(bank, QUIZ_SIZE);
-  const answers = Array.isArray(request && request.answers) ? request.answers : [];
-  let score = 0;
-  const results = questions.map(function (question, index) {
-    const selectedIndex = Number(answers[index]);
-    const isCorrect = selectedIndex === question.correctIndex;
-
-    if (isCorrect) {
-      score += POINTS_PER_QUESTION;
-    }
-
-    return {
-      word: question.word,
-      selectedIndex: selectedIndex,
-      correctIndex: question.correctIndex,
-      isCorrect: isCorrect,
-      explanation: question.explanation
-    };
-  });
-
-  return {
-    success: true,
-    score: score,
-    totalScore: TOTAL_SCORE,
-    questionCount: questions.length,
-    results: results
-  };
-}
-
-function loadQuestionBank() {
-  const sheetInfo = tryLoadSheetQuestionBank();
-  if (sheetInfo.questions.length) {
-    return sheetInfo;
-  }
-
-  return {
-    sourceLabel: '內建題庫',
-    questions: getFallbackQuestionBank()
-  };
-}
-
-function tryLoadSheetQuestionBank() {
-  const spreadsheet = getQuestionSpreadsheet();
-  if (!spreadsheet) {
-    return { sourceLabel: '內建題庫', questions: [] };
-  }
-
-  for (let i = 0; i < SHEET_CANDIDATES.length; i++) {
-    const name = SHEET_CANDIDATES[i];
-    const sheet = spreadsheet.getSheetByName(name);
-    if (!sheet) {
-      continue;
-    }
-
-    const values = sheet.getDataRange().getValues();
-    if (values.length < 2) {
-      return { sourceLabel: '工作表：' + name, questions: [] };
-    }
-
-    const header = values.shift().map(function (cell) {
-      return String(cell || '').trim();
-    });
-    const rows = values
-      .map(function (row) {
-        return normalizeSheetRow(row, header);
-      })
-      .filter(function (entry) {
-        return entry.word && entry.answer;
-      });
-
-    if (!rows.length) {
-      return { sourceLabel: '工作表：' + name, questions: [] };
-    }
-
-    return {
-      sourceLabel: '工作表：' + name,
-      questions: rows.map(function (entry) {
-        const distractors = buildDistractors(entry, rows);
-        const options = shuffleArray([entry.answer].concat(distractors).slice(0, 4));
-        return buildQuestion(entry.word, entry.answer, options, entry.explanation || '');
-      })
-    };
-  }
-
-  return { sourceLabel: '內建題庫', questions: [] };
-}
-
-function getQuestionSpreadsheet() {
+function getQuizData() {
   try {
-    if (SPREADSHEET_ID) {
-      return SpreadsheetApp.openById(SPREADSHEET_ID);
+    const quizData = readQuizDataFromSpreadsheet();
+    if (quizData.length > 0) {
+      return quizData;
     }
   } catch (error) {
-    // Fall back to the active spreadsheet below.
+    Logger.log('讀取試算表題庫失敗：' + error);
   }
 
-  try {
-    return SpreadsheetApp.getActiveSpreadsheet();
-  } catch (error) {
+  return getFallbackQuizData();
+}
+
+function readQuizDataFromSpreadsheet() {
+  const spreadsheet = SpreadsheetApp.openById(QUIZ_SPREADSHEET_ID);
+  const sheet = getQuizSheet(spreadsheet);
+
+  if (!sheet) {
+    return [];
+  }
+
+  const rows = sheet.getDataRange().getDisplayValues();
+  if (!rows || rows.length < 2) {
+    return [];
+  }
+
+  const headers = rows[0].map(normalizeHeader);
+  const columnMap = buildColumnMap(headers);
+  const quizData = [];
+
+  for (let rowIndex = 1; rowIndex < rows.length; rowIndex += 1) {
+    const row = rows[rowIndex];
+    const item = buildQuizItemFromRow(row, columnMap);
+    if (item) {
+      quizData.push(item);
+    }
+  }
+
+  return quizData;
+}
+
+function getQuizSheet(spreadsheet) {
+  if (QUIZ_SHEET_NAME) {
+    const namedSheet = spreadsheet.getSheetByName(QUIZ_SHEET_NAME);
+    if (namedSheet) {
+      return namedSheet;
+    }
+  }
+
+  return spreadsheet.getSheets()[0] || null;
+}
+
+function buildColumnMap(headers) {
+  return {
+    question: findHeaderIndex(headers, ['題目', '問題', 'question', 'quiz', '題幹']),
+    optionA: findHeaderIndex(headers, ['a', '選項a', '選項1', 'option1', '答案a']),
+    optionB: findHeaderIndex(headers, ['b', '選項b', '選項2', 'option2', '答案b']),
+    optionC: findHeaderIndex(headers, ['c', '選項c', '選項3', 'option3', '答案c']),
+    optionD: findHeaderIndex(headers, ['d', '選項d', '選項4', 'option4', '答案d']),
+    answer: findHeaderIndex(headers, ['答案', '正確答案', 'answer', 'answerkey', '正解']),
+    points: findHeaderIndex(headers, ['分數', '配分', 'score', 'points'])
+  };
+}
+
+function buildQuizItemFromRow(row, columnMap) {
+  const question = getCellValue(row, columnMap.question, 0);
+  const options = [
+    getCellValue(row, columnMap.optionA, 1),
+    getCellValue(row, columnMap.optionB, 2),
+    getCellValue(row, columnMap.optionC, 3),
+    getCellValue(row, columnMap.optionD, 4)
+  ].filter(Boolean);
+
+  if (!question || options.length < 2) {
     return null;
   }
-}
 
-function normalizeSheetRow(row, header) {
-  const wordIndex = findHeaderIndex(header, ['英文', '單字', 'word', 'english']);
-  const answerIndex = findHeaderIndex(header, ['中文', '解釋', 'answer', 'meaning']);
-  const explanationIndex = findHeaderIndex(header, ['說明', '備註', 'explanation', 'note']);
-  const optionsStart = findHeaderIndex(header, ['選項1', 'option1', '選項Ａ', 'distractor1']);
-
-  const word = String(getCell(row, wordIndex, 0) || '').trim();
-  const answer = String(getCell(row, answerIndex, 1) || '').trim();
-  const explanation = String(getCell(row, explanationIndex, 2) || '').trim();
-  const options = [];
-
-  if (optionsStart >= 0) {
-    for (let i = optionsStart; i < row.length; i++) {
-      const value = String(row[i] || '').trim();
-      if (value) {
-        options.push(value);
-      }
-    }
-  }
+  const answerValue = getCellValue(row, columnMap.answer, 5);
+  const answer = parseAnswerIndex(answerValue, options);
+  const pointsValue = getCellValue(row, columnMap.points, 6);
+  const points = parsePoints(pointsValue, options.length);
 
   return {
-    word: word,
+    question: question,
+    options: options,
     answer: answer,
-    explanation: explanation,
-    options: options
+    points: points
   };
 }
 
-function getCell(row, index, fallbackIndex) {
-  if (index >= 0 && row[index] !== undefined) {
-    return row[index];
+function getCellValue(row, index, fallbackIndex) {
+  const value = row && index >= 0 ? row[index] : '';
+  if (value !== undefined && value !== null && String(value).trim() !== '') {
+    return String(value).trim();
   }
-  return row[fallbackIndex];
+
+  const fallbackValue = row && fallbackIndex >= 0 ? row[fallbackIndex] : '';
+  return fallbackValue !== undefined && fallbackValue !== null ? String(fallbackValue).trim() : '';
 }
 
-function findHeaderIndex(header, candidates) {
-  for (let i = 0; i < header.length; i++) {
-    const value = header[i].toLowerCase();
-    if (candidates.some(function (candidate) {
-      return value === candidate.toLowerCase() || value.indexOf(candidate.toLowerCase()) !== -1;
-    })) {
-      return i;
+function normalizeHeader(value) {
+  return String(value || '')
+    .toLowerCase()
+    .replace(/\s+/g, '')
+    .replace(/[\u3000]/g, '')
+    .replace(/[：:()（）\[\]【】.]/g, '');
+}
+
+function findHeaderIndex(headers, candidates) {
+  for (let index = 0; index < headers.length; index += 1) {
+    if (candidates.indexOf(headers[index]) !== -1) {
+      return index;
     }
   }
+
   return -1;
 }
 
-function buildDistractors(entry, rows) {
-  if (Array.isArray(entry.options) && entry.options.length) {
-    return entry.options.filter(function (option) {
-      return option !== entry.answer;
-    }).slice(0, 3);
+function parseAnswerIndex(value, options) {
+  const normalized = String(value || '').trim();
+  if (!normalized) {
+    return 0;
   }
 
-  const pool = rows
-    .map(function (row) {
-      return row.answer;
-    })
-    .filter(function (answer) {
-      return answer && answer !== entry.answer;
-    });
-
-  return shuffleArray(uniqueValues(pool)).slice(0, 3);
-}
-
-function pickQuestions(bank, count) {
-  const source = shuffleArray(bank.questions.slice());
-  return source.slice(0, Math.min(count, source.length));
-}
-
-function buildQuestion(word, answer, options, explanation) {
-  const normalizedOptions = uniqueValues(options.concat([answer])).slice(0, 4);
-  while (normalizedOptions.length < 4) {
-    normalizedOptions.push(answer + '（同義）');
-  }
-
-  const shuffledOptions = shuffleArray(normalizedOptions);
-  const correctIndex = shuffledOptions.indexOf(answer);
-
-  return {
-    word: word,
-    answer: answer,
-    options: shuffledOptions,
-    correctIndex: correctIndex < 0 ? 0 : correctIndex,
-    explanation: explanation || ''
-  };
-}
-
-function getFallbackQuestionBank() {
-  return [
-    buildQuestion('advantage', '優點；優勢', ['優點；優勢', '老闆', '勇敢的', '日曆；行事曆'], 'advantage 表示有利條件或優點。'),
-    buildQuestion('calendar', '日曆；行事曆', ['日曆；行事曆', '優點；優勢', '資料夾', '擴音器'], 'calendar 是記錄日期與月份的表。'),
-    buildQuestion('brave', '勇敢的', ['勇敢的', '平靜的', '吵雜的', '明亮的'], 'brave 用來形容勇敢、不害怕。'),
-    buildQuestion('boss', '老闆', ['老闆', '同學', '鄰居', '助手'], 'boss 是主管或老闆。'),
-    buildQuestion('popular', '受歡迎的', ['受歡迎的', '迅速的', '透明的', '疲倦的'], 'popular 表示很多人喜歡。'),
-    buildQuestion('perhaps', '也許；可能', ['也許；可能', '一定', '昨天', '永遠'], 'perhaps 表示不確定的推測。'),
-    buildQuestion('improve', '改善；進步', ['改善；進步', '破壞', '停止', '遺忘'], 'improve 是讓事情變得更好。'),
-    buildQuestion('receive', '收到', ['收到', '發送', '製作', '修理'], 'receive 是接受或收到。'),
-    buildQuestion('research', '研究；調查', ['研究；調查', '跑步', '洗澡', '旅行'], 'research 是仔細地探究。'),
-    buildQuestion('support', '支持；支援', ['支持；支援', '懷疑', '阻止', '切換'], 'support 表示幫助或贊同。'),
-    buildQuestion('value', '價值；重要性', ['價值；重要性', '速度', '角落', '天氣'], 'value 表示值得程度或價格。'),
-    buildQuestion('wonder', '想知道；驚奇', ['想知道；驚奇', '倒塌', '裝飾', '微笑'], 'wonder 可作動詞或名詞。')
-  ];
-}
-
-function shuffleArray(values) {
-  const result = values.slice();
-  for (let i = result.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    const temp = result[i];
-    result[i] = result[j];
-    result[j] = temp;
-  }
-  return result;
-}
-
-function uniqueValues(values) {
-  const seen = {};
-  return values.filter(function (value) {
-    const key = String(value).trim();
-    if (!key || seen[key]) {
-      return false;
+  const numeric = Number(normalized);
+  if (!Number.isNaN(numeric)) {
+    if (numeric >= 1 && numeric <= options.length) {
+      return numeric - 1;
     }
-    seen[key] = true;
-    return true;
+    if (numeric >= 0 && numeric < options.length) {
+      return numeric;
+    }
+  }
+
+  const letter = normalized.toUpperCase();
+  const letterIndex = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.indexOf(letter);
+  if (letterIndex >= 0 && letterIndex < options.length) {
+    return letterIndex;
+  }
+
+  const optionIndex = options.findIndex(function (option) {
+    return normalizeHeader(option) === normalizeHeader(normalized);
   });
+
+  return optionIndex >= 0 ? optionIndex : 0;
+}
+
+function parsePoints(value, optionCount) {
+  const numeric = Number(String(value || '').trim());
+  if (!Number.isNaN(numeric) && numeric > 0) {
+    return numeric;
+  }
+
+  return 10;
+}
+
+function getFallbackQuizData() {
+  return [
+    {
+      question: '在 Google Apps Script 中，哪一個函式通常用來提供網頁入口？',
+      options: ['doGet()', 'main()', 'startApp()', 'renderPage()'],
+      answer: 0,
+      points: 10
+    },
+    {
+      question: '如果要建立一個可直接在瀏覽器顯示的頁面，應該優先使用哪個服務？',
+      options: ['HtmlService', 'DriveApp', 'SpreadsheetApp', 'MailApp'],
+      answer: 0,
+      points: 10
+    },
+    {
+      question: '要讀取試算表資料，最常用的 GAS 類別是哪一個？',
+      options: ['SpreadsheetApp', 'PropertiesService', 'LockService', 'CacheService'],
+      answer: 0,
+      points: 10
+    },
+    {
+      question: '若想把資料寫入 Google 雲端硬碟，通常會使用哪個服務？',
+      options: ['DriveApp', 'Browser', 'UrlFetchApp', 'Session'],
+      answer: 0,
+      points: 10
+    },
+    {
+      question: '下列哪一個功能最適合記錄除錯訊息？',
+      options: ['Logger.log()', 'alert()', 'console.table()', 'print()'],
+      answer: 0,
+      points: 10
+    },
+    {
+      question: '要將網頁部署成 Web App，通常需要在什麼地方設定？',
+      options: ['部署 / 新部署', '檔案 / 另存新檔', '編輯 / 偏好設定', '執行 / 測試模式'],
+      answer: 0,
+      points: 10
+    },
+    {
+      question: '如果想儲存少量設定值，例如分數或使用者狀態，哪個服務最合適？',
+      options: ['PropertiesService', 'MimeType', 'CalendarApp', 'DocumentApp'],
+      answer: 0,
+      points: 10
+    },
+    {
+      question: '哪一個物件常用來獲取目前使用者的資訊或時區？',
+      options: ['Session', 'FormApp', 'SlidesApp', 'LockService'],
+      answer: 0,
+      points: 10
+    },
+    {
+      question: '在 HTML 頁面中，若要把 GAS 資料傳回前端，常見方式是什麼？',
+      options: ['google.script.run', 'fetch() 直接讀 Apps Script 內部函式', 'window.drive.send()', 'script.callServer()'],
+      answer: 0,
+      points: 10
+    },
+    {
+      question: '下列哪一個工具可用來格式化日期與時間？',
+      options: ['Utilities.formatDate()', 'SpreadsheetApp.format()', 'DriveApp.date()', 'HtmlService.format()'],
+      answer: 0,
+      points: 10
+    }
+  ];
 }
