@@ -1,0 +1,46 @@
+<svg width="1280" height="720" viewBox="0 0 1280 720" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1280" y2="720" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#EAF7FF"/>
+      <stop offset="1" stop-color="#B9E3FF"/>
+    </linearGradient>
+    <linearGradient id="card" x1="260" y1="130" x2="1040" y2="590" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFFFFF"/>
+      <stop offset="1" stop-color="#F4FBFF"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="340" y1="210" x2="940" y2="510" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#4FA7DF"/>
+      <stop offset="1" stop-color="#7CC8EC"/>
+    </linearGradient>
+    <filter id="shadow" x="220" y="110" width="840" height="520" filterUnits="userSpaceOnUse">
+      <feDropShadow dx="0" dy="18" stdDeviation="24" flood-color="#5AA7D6" flood-opacity="0.18"/>
+    </filter>
+  </defs>
+
+  <rect width="1280" height="720" rx="48" fill="url(#bg)"/>
+  <circle cx="170" cy="120" r="70" fill="#FFFFFF" fill-opacity="0.55"/>
+  <circle cx="1110" cy="150" r="110" fill="#FFFFFF" fill-opacity="0.35"/>
+  <circle cx="1030" cy="585" r="90" fill="#FFFFFF" fill-opacity="0.35"/>
+  <circle cx="250" cy="580" r="80" fill="#FFFFFF" fill-opacity="0.4"/>
+
+  <g filter="url(#shadow)">
+    <rect x="250" y="140" width="780" height="440" rx="34" fill="url(#card)"/>
+    <rect x="290" y="180" width="700" height="84" rx="24" fill="url(#accent)"/>
+    <text x="340" y="232" fill="white" font-family="Arial, sans-serif" font-size="34" font-weight="700">7. 設計GAS程式</text>
+
+    <rect x="320" y="302" width="184" height="116" rx="22" fill="#E9F7FF" stroke="#D4ECFA"/>
+    <rect x="528" y="302" width="184" height="116" rx="22" fill="#F2F8FF" stroke="#D4ECFA"/>
+    <rect x="736" y="302" width="184" height="116" rx="22" fill="#E9F7FF" stroke="#D4ECFA"/>
+
+    <circle cx="412" cy="360" r="28" fill="none" stroke="#4FA7DF" stroke-width="10"/>
+    <circle cx="620" cy="360" r="28" fill="none" stroke="#4FA7DF" stroke-width="10"/>
+    <circle cx="828" cy="360" r="28" fill="none" stroke="#4FA7DF" stroke-width="10"/>
+
+    <rect x="348" y="458" width="580" height="26" rx="13" fill="#DCEFFC"/>
+    <rect x="348" y="500" width="420" height="26" rx="13" fill="#DCEFFC"/>
+    <rect x="348" y="542" width="310" height="26" rx="13" fill="#DCEFFC"/>
+
+    <circle cx="912" cy="506" r="56" fill="#DFF5EA"/>
+    <path d="M882 506 L902 526 L944 484" stroke="#2E9F71" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+</svg>
