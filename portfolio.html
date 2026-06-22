@@ -6,7 +6,6 @@
   <title>作品集 — Dick in a Toaster</title>
   <style>
     body{font-family:Arial,Helvetica,sans-serif;color:#111;margin:0;padding:40px;background:linear-gradient(180deg,#e6f6ff 0%,#d6f0ff 60%);background-attachment:fixed}
-    /* soft cloud effect using radial gradients */
     body::before{content:"";position:fixed;inset:0;pointer-events:none;background-image:radial-gradient(circle at 10% 15%, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0) 20%),radial-gradient(circle at 85% 30%, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0) 18%),radial-gradient(circle at 50% 80%, rgba(255,255,255,0.92) 0%, rgba(255,255,255,0) 22%);opacity:0.9}
     .card{max-width:980px;margin:20px auto;padding:26px;background:rgba(255,255,255,0.95);border-radius:14px;box-shadow:0 12px 30px rgba(31,111,166,0.06);border:1px solid rgba(31,111,166,0.06)}
     h1{margin:0 0 10px}
@@ -14,9 +13,6 @@
     a.button{display:inline-block;margin-top:12px;padding:10px 14px;background:#4ea6d6;color:#fff;border-radius:8px;text-decoration:none}
     .grid{display:grid;grid-template-columns:1fr 320px;gap:20px}
     pre{background:#fafafa;padding:12px;border-radius:8px;overflow:auto}
-
-    /* project card styles */
-    .projects{margin-top:22px;display:flex;gap:20px;flex-wrap:wrap}
     .project-card{display:block;width:320px;text-decoration:none;color:inherit}
     .project-card .thumb{border-radius:12px;overflow:hidden;border:1px solid #eee;box-shadow:0 8px 18px rgba(0,0,0,0.06);background:#fff}
     .project-card .thumb img{display:block;width:100%;height:auto;aspect-ratio:16/9;object-fit:cover}
@@ -34,14 +30,14 @@
       <section>
         <h1>聊天應用 — ntfy.sh 即時通知整合</h1>
         <div class="meta">技術：HTML / CSS / JavaScript / ntfy.sh / PowerShell</div>
-        <p>這個範例示範如何使用 <a href="https://ntfy.sh" target="_blank" rel="noreferrer">ntfy.sh</a> 提供簡單的 Publish/Subscribe 通知功能，並把它嵌入單頁聊天介面。使用者可以直接於瀏覽器連線訂閱主題，或由腳本與 VS Code 任務發送通知。</p>
+        <p>這個範例示範如何使用 <a href="https://ntfy.sh" target="_blank" rel="noreferrer">ntfy.sh</a> 提供簡單的 Publish/Subscribe 通知功能，並把它嵌入單頁聊天介面。</p>
 
         <h3>特色</h3>
         <ul>
           <li>HTTPS 發送（POST）到 ntfy.sh</li>
           <li>Server-Sent Events (SSE) 訂閱（/sse）即時接收</li>
-          <li>支援中文主題（URL 編碼）與錯誤處理</li>
-          <li>含 PowerShell 腳本 `scripts/send-ntfy.ps1` 與 VS Code 任務範本</li>
+          <li>支援中文主題與錯誤處理</li>
+          <li>含 PowerShell 腳本與 VS Code 任務範本</li>
         </ul>
 
         <h3>快速示範</h3>
@@ -57,7 +53,8 @@
             <div style="color:#666;font-size:0.95rem">單頁聊天 UI，整合 ntfy.sh 發送與 SSE 訂閱</div>
           </a>
           <div style="flex-basis:100%;height:0"></div>
-          <a href="/7/index.html" target="_blank" style="display:block;width:320px;text-decoration:none;color:inherit;margin-top:8px;">
+          
+          <a href="https://script.google.com/macros/s/AKfycbxQkKM80kILQFs_cYeL0qjaCpSm4R3lX1TlYs75SNTupJC6wzdKqw6Hqf9fjRVuNrMlJg/exec" target="_blank" style="display:block;width:320px;text-decoration:none;color:inherit;margin-top:8px;">
             <div style="border-radius:12px;overflow:hidden;border:1px solid #eee;box-shadow:0 8px 18px rgba(0,0,0,0.06);background:linear-gradient(180deg,#eaf6ff,#ffffff);display:flex;align-items:center;justify-content:center;">
               <div style="font-weight:900;color:#1f6fa6;font-size:20px;padding:28px 6px">7. 設計GAS程式</div>
             </div>
@@ -66,7 +63,6 @@
           </a>
         </div>
 
-        <!-- 顯示為作品卡片區（包含第7項） -->
         <div style="margin-top:22px; display:flex; gap:20px; flex-wrap:wrap;">
           <a href="/5/index.html" target="_blank" style="display:block;width:320px;text-decoration:none;color:inherit;">
             <div style="border-radius:12px;overflow:hidden;border:1px solid #eee;box-shadow:0 8px 18px rgba(0,0,0,0.06);background:#fff;">
@@ -77,7 +73,7 @@
             <div style="margin-top:8px"><span style="display:inline-block;padding:8px 12px;background:#4ea6d6;color:#fff;border-radius:8px">打開範例</span></div>
           </a>
 
-          <a href="/7/index.html" target="_blank" style="display:block;width:320px;text-decoration:none;color:inherit;">
+          <a href="https://script.google.com/macros/s/AKfycbxQkKM80kILQFs_cYeL0qjaCpSm4R3lX1TlYs75SNTupJC6wzdKqw6Hqf9fjRVuNrMlJg/exec" target="_blank" style="display:block;width:320px;text-decoration:none;color:inherit;">
             <div style="border-radius:12px;overflow:hidden;border:1px solid #eee;box-shadow:0 8px 18px rgba(0,0,0,0.06);background:linear-gradient(180deg,#eaf6ff,#ffffff);">
               <img src="assets/quiz.png" alt="quiz 縮圖" style="width:100%;height:auto;display:block;aspect-ratio:16/9;object-fit:cover;" />
             </div>
@@ -86,13 +82,22 @@
             <div style="margin-top:8px"><span style="display:inline-block;padding:8px 12px;background:#1f6fa6;color:#fff;border-radius:8px">開始測驗</span></div>
           </a>
         </div>
+
+        <h3 style="margin-top:40px;">GAS 程式線上即時體驗</h3>
+        <div style="border-radius:12px; overflow:hidden; border:1px solid #eee; box-shadow:0 8px 18px rgba(0,0,0,0.06);">
+          <iframe 
+            src="https://script.google.com/macros/s/AKfycbxQkKM80kILQFs_cYeL0qjaCpSm4R3lX1TlYs75SNTupJC6wzdKqw6Hqf9fjRVuNrMlJg/exec" 
+            width="100%" 
+            height="550px" 
+            frameborder="0">
+          </iframe>
         </div>
 
-        <h3>命令列發送示例</h3>
+        <h3 style="margin-top:40px;">命令列發送示例</h3>
         <pre>pwsh -NoProfile -ExecutionPolicy Bypass -File .\scripts\send-ntfy.ps1 -Server "https://ntfy.sh" -Topic "drher" -Title "怡文" -Message "測試通知"</pre>
 
         <h3>注意</h3>
-        <p>若使用自有 ntfy 伺服器，請在 Server 欄輸入完整 URL（例如 https://ntfy.example.com）。若使用本機的自訂主機名稱（如 drher），請確保 DNS/hosts 有對應。</p>
+        <p>若使用自有 ntfy 伺服器，請在 Server 欄輸入完整 URL。若使用本機的自訂主機名稱，請確保 DNS/hosts 有對應。</p>
       </section>
 
       <aside>
@@ -101,6 +106,8 @@
           <li><a href="/5/index.html">5/index.html</a> — 聊天應用主頁</li>
           <li><a href="/scripts/send-ntfy.ps1">scripts/send-ntfy.ps1</a> — PowerShell 發送腳本</li>
           <li><a href="/.vscode/tasks.json">.vscode/tasks.json</a> — VS Code 任務設定</li>
+          
+          <li><a href="https://script.google.com/macros/s/AKfycbxQkKM80kILQFs_cYeL0qjaCpSm4R3lX1TlYs75SNTupJC6wzdKqw6Hqf9fjRVuNrMlJg/exec" target="_blank">Google 試算表後端程式 (GAS)</a></li>
         </ul>
 
         <h4>說明檔</h4>
